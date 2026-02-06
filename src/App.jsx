@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { 
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
   Search, Pencil, X, Mail, ArrowUpDown, AlertTriangle, 
-  ExternalLink, FileText, Upload, FileCheck 
+  ExternalLink, FileText, Upload, FileCheck, FileSpreadsheet 
 } from 'lucide-react';
 
 // 👇 REMETS TES CLÉS SUPABASE ICI
