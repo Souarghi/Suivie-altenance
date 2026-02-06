@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { 
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
   Search, Pencil, X, Mail, AlertTriangle, ExternalLink, FileText, 
-  Upload, FileCheck, FileSpreadsheet, List, LogOut, User, Lock, Eye, EyeOff, Heart, LayoutGrid,
-  Filter, CheckCircle, RefreshCw
+  Upload, FileCheck, List, LogOut, User, Lock, LayoutGrid,
+  CheckCircle, RefreshCw, AlertOctagon
 } from 'lucide-react';
 
 // 👇 REMETS TES CLÉS SUPABASE ICI
@@ -19,30 +18,27 @@ const safeSupabase = () => {
 };
 const supabase = safeSupabase();
 
-// --- DONNÉES ---
+// --- DONNÉES & COULEURS ---
 const JOB_BOARDS = [
-  { name: 'LinkedIn', url: 'https://www.linkedin.com/jobs/', color: 'bg-[#0077b5]' },
-  { name: 'HelloWork', url: 'https://www.hellowork.com/', color: 'bg-[#ff0000]' },
-  { name: 'Welcome to the Jungle', url: 'https://www.welcometothejungle.com/', color: 'bg-[#ffcd00] text-black' },
-  { name: 'Indeed', url: 'https://fr.indeed.com/', color: 'bg-[#2164f3]' },
-  { name: 'AFI24', url: 'https://www.afi24.org/', color: 'bg-purple-700' },
-  { name: 'APEC', url: 'https://www.apec.fr/', color: 'bg-[#0f1f41]' },
-  { name: 'JobTeaser', url: 'https://cytech.jobteaser.com/', color: 'bg-[#00ab65]' },
-  { name: 'MyJobGlasses', url: 'https://www.myjobglasses.com/', color: 'bg-pink-600' },
-  { name: 'Data Alumni', url: 'https://cytech.datalumni.com/', color: 'bg-cyan-600' },
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/jobs/', color: 'text-[#0077b5] border-[#0077b5] hover:bg-[#0077b5] hover:text-white' },
+  { name: 'HelloWork', url: 'https://www.hellowork.com/', color: 'text-[#ff0000] border-[#ff0000] hover:bg-[#ff0000] hover:text-white' },
+  { name: 'WTTJ', url: 'https://www.welcometothejungle.com/', color: 'text-[#ffcd00] border-[#ffcd00] hover:bg-[#ffcd00] hover:text-black' },
+  { name: 'Indeed', url: 'https://fr.indeed.com/', color: 'text-[#2164f3] border-[#2164f3] hover:bg-[#2164f3] hover:text-white' },
+  { name: 'AFI24', url: 'https://www.afi24.org/', color: 'text-purple-700 border-purple-700 hover:bg-purple-700 hover:text-white' },
+  { name: 'APEC', url: 'https://www.apec.fr/', color: 'text-[#0f1f41] border-[#0f1f41] hover:bg-[#0f1f41] hover:text-white' },
+  { name: 'JobTeaser', url: 'https://cytech.jobteaser.com/', color: 'text-[#00ab65] border-[#00ab65] hover:bg-[#00ab65] hover:text-white' },
+  { name: 'MyJobGlasses', url: 'https://www.myjobglasses.com/', color: 'text-pink-600 border-pink-600 hover:bg-pink-600 hover:text-white' },
 ];
 
-// --- COMPOSANT ROUTINE QUOTIDIENNE ---
+// --- COMPOSANT ROUTINE (CHECKLIST) ---
 const DailyRoutine = () => {
   const [checks, setChecks] = useState({});
   const today = new Date().toLocaleDateString('fr-FR');
 
   useEffect(() => {
-    // Charger la routine depuis le navigateur
     const saved = JSON.parse(localStorage.getItem('dailyRoutine') || '{}');
     if (saved.date !== today) {
-      // Si c'est un nouveau jour, on reset tout !
-      setChecks({});
+      setChecks({}); // Reset le lendemain
       localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: {} }));
     } else {
       setChecks(saved.checks || {});
@@ -62,26 +58,19 @@ const DailyRoutine = () => {
       <div className="flex justify-between items-center mb-3">
         <h3 className="font-bold flex items-center gap-2 text-gray-800">
             <RefreshCw size={18} className={progress === 100 ? "text-green-500" : "text-blue-600"}/> 
-            Routine Quotidienne <span className="text-xs font-normal text-gray-400">({today})</span>
+            Routine du Matin <span className="text-xs font-normal text-gray-400">({today})</span>
         </h3>
         <div className="text-xs font-bold text-gray-500">{progress}% fait</div>
       </div>
-      
-      {/* Barre de progression */}
       <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
         <div className={`h-2 rounded-full transition-all duration-500 ${progress === 100 ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${progress}%` }}></div>
       </div>
-
       <div className="flex flex-wrap gap-2">
         {JOB_BOARDS.map(site => (
-          <button 
-            key={site.name}
-            onClick={() => toggleCheck(site.name)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${checks[site.name] ? 'bg-green-50 border-green-200 text-green-700 opacity-60' : 'bg-white border-gray-200 hover:border-blue-300 text-gray-700'}`}
-          >
-            {checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-gray-300"></div>}
+          <button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>
+            {checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-current"></div>}
             {site.name}
-            <a href={site.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="ml-1 text-gray-400 hover:text-blue-600"><ExternalLink size={10}/></a>
+            <a href={site.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="ml-1 opacity-70 hover:opacity-100"><ExternalLink size={10}/></a>
           </button>
         ))}
       </div>
@@ -112,7 +101,6 @@ const AuthScreen = ({ supabase }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full text-center">
-        {/* LOGO PLACEHOLDER */}
         <img src="/logo.png" onError={(e) => e.target.style.display='none'} alt="Logo" className="w-20 h-20 mx-auto mb-4 rounded-xl object-contain"/>
         <h1 className="text-2xl font-bold mb-2 text-gray-800">Suivi Alternance</h1>
         <p className="text-gray-500 text-sm mb-6">{isSignUp ? "Créer un compte" : "Connexion à ton espace"}</p>
@@ -137,14 +125,20 @@ const App = () => {
   
   // UI States
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortType, setSortType] = useState("date"); // 'date' ou 'alpha'
+  const [sortType, setSortType] = useState("date");
   const [viewMode, setViewMode] = useState("list"); 
   const [editingId, setEditingId] = useState(null);
   const [fileLM, setFileLM] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [newApp, setNewApp] = useState({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", date: new Date().toISOString().split('T')[0], lm_url: "" });
+  
+  // FORMULAIRE
+  const [newApp, setNewApp] = useState({ 
+    company: "", role: "", status: "A faire", location: "", source: "LinkedIn", 
+    contact_email: "", date: new Date().toISOString().split('T')[0], relanceDone: false, lm_url: "" 
+  });
 
   const statusOptions = ["A faire", "Postulé", "Entretien", "Accepté", "Refusé"];
+  const sourceOptions = ["LinkedIn", "Indeed", "HelloWork", "Welcome to the Jungle", "JobTeaser", "Contact direct", "Site Entreprise", "Autre"];
 
   useEffect(() => {
     if (!supabase) return;
@@ -163,13 +157,8 @@ const App = () => {
       const { data: apps } = await supabase.from('applications').select('*');
       setApplications(apps || []);
       const { data: prof } = await supabase.from('profile').select('*').limit(1).maybeSingle();
-      if (prof) {
-        setProfile(prof);
-      } else { 
-        // ICI C'ETAIT L'ERREUR, J'AI REMPLACÉ 'new' par 'newProf'
-        const { data: newProf } = await supabase.from('profile').insert([{}]).select().single(); 
-        if(newProf) setProfile(newProf); 
-      }
+      if (prof) setProfile(prof);
+      else { const { data: newProf } = await supabase.from('profile').insert([{}]).select().single(); if(newProf) setProfile(newProf); }
     } catch (e) { console.error(e); } 
     finally { setLoading(false); }
   };
@@ -198,6 +187,8 @@ const App = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isDuplicate && !editingId) return alert("Doublon détecté !"); // Bloque si doublon
+    
     setUploading(true);
     let url = newApp.lm_url;
     if (fileLM) { const u = await uploadFile(fileLM); if(u) url = u; }
@@ -221,16 +212,25 @@ const App = () => {
     }
   };
 
-  const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", date: new Date().toISOString().split('T')[0], lm_url: "" }); setFileLM(null); setEditingId(null); };
+  // CHECKBOX RELANCE
+  const toggleRelance = async (app) => {
+    const newVal = !app.relanceDone;
+    // Optimistic UI update
+    setApplications(prev => prev.map(a => a.id === app.id ? { ...a, relanceDone: newVal } : a));
+    await supabase.from('applications').update({ relanceDone: newVal }).eq('id', app.id);
+  };
+
+  const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", date: new Date().toISOString().split('T')[0], lm_url: "", relanceDone: false }); setFileLM(null); setEditingId(null); };
   const calculateRelance = (d) => { if (!d) return "-"; const date = new Date(d); date.setDate(date.getDate() + 15); return date.toLocaleDateString('fr-FR'); };
 
-  // --- TRI ET FILTRE ---
+  // --- LOGIQUE DOUBLON (Fuzzy Search) ---
+  const normalize = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
+  const isDuplicate = newApp.company && applications.some(app => normalize(app.company) === normalize(newApp.company) && app.id !== editingId);
+
+  // --- FILTRES ---
   const filteredApps = applications
     .filter(a => a.company?.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      if (sortType === 'alpha') return a.company.localeCompare(b.company);
-      return new Date(b.date) - new Date(a.date); // Par défaut : date décroissante
-    });
+    .sort((a, b) => sortType === 'alpha' ? a.company.localeCompare(b.company) : new Date(b.date) - new Date(a.date));
 
   if (!supabase) return <div className="p-10 text-red-600 text-center">Clés manquantes</div>;
   if (!session) return <AuthScreen supabase={supabase} />;
@@ -242,7 +242,6 @@ const App = () => {
         {/* HEADER */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-             {/* LOGO PETIT DANS L'ENTETE */}
              <img src="/logo.png" onError={(e) => e.target.style.display='none'} className="w-10 h-10 rounded-lg object-contain bg-gray-50" alt="Logo"/>
              <h1 className="font-bold text-xl text-[#0f1f41] hidden md:block">Suivi Alternance</h1>
           </div>
@@ -252,44 +251,35 @@ const App = () => {
           </div>
         </div>
 
-        {/* 1. ROUTINE QUOTIDIENNE (Checklist) */}
+        {/* CHECKLIST */}
         <DailyRoutine />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* GAUCHE : CVS & FORMULAIRE */}
+          {/* COLONNE GAUCHE */}
           <div className="space-y-6">
             
-            {/* BOUTONS UPLOAD AMÉLIORÉS */}
+            {/* DOCS */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                <h2 className="font-bold flex items-center gap-2 mb-4 text-[#0f1f41]"><FileCheck className="text-[#005792]"/> Mes Documents</h2>
                <div className="space-y-3">
-                  {/* CV ATS */}
                   <div className="relative group">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_ats ? 'border-[#00ab65] bg-green-50' : 'border-dashed border-gray-300 hover:border-[#005792] hover:bg-blue-50'}`}>
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-full ${profile?.cv_ats ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}><FileText size={18}/></div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-gray-700">CV ATS (Robot)</span>
-                          <span className="text-[10px] text-gray-400">{profile?.cv_ats ? "Fichier chargé" : "PDF uniquement"}</span>
-                        </div>
+                        <div><span className="text-sm font-bold text-gray-700 block">CV ATS (Robot)</span><span className="text-[10px] text-gray-400">{profile?.cv_ats ? "Chargé" : "PDF"}</span></div>
                       </div>
-                      {uploading ? <span className="text-xs">...</span> : <Upload size={16} className="text-gray-400 group-hover:text-[#005792]"/>}
+                      <Upload size={16} className="text-gray-400"/>
                       <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'ats')} disabled={uploading}/>
                     </label>
                     {profile?.cv_ats && <a href={profile.cv_ats} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#00ab65] hover:underline z-10">Voir</a>}
                   </div>
-
-                  {/* CV HUMAIN */}
                   <div className="relative group">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_human ? 'border-[#005792] bg-blue-50' : 'border-dashed border-gray-300 hover:border-[#fdbb2d] hover:bg-yellow-50'}`}>
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-full ${profile?.cv_human ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}><User size={18}/></div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-gray-700">CV Design (Humain)</span>
-                          <span className="text-[10px] text-gray-400">{profile?.cv_human ? "Fichier chargé" : "PDF uniquement"}</span>
-                        </div>
+                        <div><span className="text-sm font-bold text-gray-700 block">CV Design (Humain)</span><span className="text-[10px] text-gray-400">{profile?.cv_human ? "Chargé" : "PDF"}</span></div>
                       </div>
-                      {uploading ? <span className="text-xs">...</span> : <Upload size={16} className="text-gray-400 group-hover:text-[#005792]"/>}
+                      <Upload size={16} className="text-gray-400"/>
                       <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'human')} disabled={uploading}/>
                     </label>
                     {profile?.cv_human && <a href={profile.cv_human} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#005792] hover:underline z-10">Voir</a>}
@@ -303,34 +293,51 @@ const App = () => {
                  <h2 className="font-bold text-[#0f1f41]">{editingId ? "Modifier" : "Nouvelle Candidature"}</h2>
                  {editingId && <button onClick={resetForm}><X size={16}/></button>}
                </div>
+               
                <form onSubmit={handleSubmit} className="space-y-3">
+                  {/* ALERTE DOUBLON */}
+                  {isDuplicate && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2 animate-pulse font-bold">
+                        <AlertOctagon size={18}/> Attention : Tu as déjà postulé ici !
+                    </div>
+                  )}
+
                   <input placeholder="Entreprise (ex: Thales)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
                   <input placeholder="Poste (ex: Data Analyst)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.role} onChange={e=>setNewApp({...newApp, role: e.target.value})} required/>
+                  
                   <div className="grid grid-cols-2 gap-3">
-                    <select className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.source} onChange={e=>setNewApp({...newApp, source: e.target.value})}>{JOB_BOARDS.map(j=><option key={j.name} value={j.name}>{j.name}</option>)}<option value="Autre">Autre</option></select>
+                    <select className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.source} onChange={e=>setNewApp({...newApp, source: e.target.value})}>{sourceOptions.map(s=><option key={s} value={s}>{s}</option>)}</select>
                     <select className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>{statusOptions.map(s=><option key={s} value={s}>{s}</option>)}</select>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                     <input type="date" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
-                     <input placeholder="Lieu" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
-                  </div>
+
+                  {/* CHAMPS CONTACT DIRECT (Conditionnel) */}
+                  {newApp.source === 'Contact direct' ? (
+                     <div className="bg-blue-50 p-3 rounded-lg space-y-2 border border-blue-100">
+                        <p className="text-xs font-bold text-blue-800 uppercase">Détails du Contact</p>
+                        <input placeholder="Nom Prénom du Contact" className="w-full border p-2 rounded text-sm" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                        <input placeholder="Email du Contact" className="w-full border p-2 rounded text-sm" value={newApp.contact_email} onChange={e=>setNewApp({...newApp, contact_email: e.target.value})} />
+                     </div>
+                  ) : (
+                     <div className="grid grid-cols-2 gap-3">
+                        <input type="date" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
+                        <input placeholder="Lieu (Ville)" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                     </div>
+                  )}
                   
-                  {/* UPLOAD LM */}
                   <label className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-dashed border-gray-300 p-2 rounded-lg text-xs text-gray-500 hover:bg-gray-100">
                      <FileText size={14}/> {newApp.lm_url ? "Lettre jointe (Changer)" : "Joindre Lettre de motiv'"}
                      <input type="file" className="hidden" onChange={(e) => setFileLM(e.target.files[0])} />
                   </label>
                   
-                  <button disabled={uploading} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : 'bg-[#005792] hover:bg-[#004270]'}`}>
+                  <button disabled={uploading || (isDuplicate && !editingId)} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : (isDuplicate ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#005792] hover:bg-[#004270]')}`}>
                     {uploading ? "..." : (editingId ? "Sauvegarder" : "Ajouter la candidature")}
                   </button>
                </form>
             </div>
           </div>
 
-          {/* DROITE : LISTE / KANBAN */}
+          {/* LISTE / KANBAN */}
           <div className="lg:col-span-2 space-y-4">
-             {/* BARRE DE RECHERCHE & TRI */}
              <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex bg-white rounded-lg border p-1">
                    <button onClick={()=>setViewMode('list')} className={`p-2 rounded ${viewMode==='list'?'bg-gray-100 text-blue-600':'text-gray-400'}`}><List size={18}/></button>
@@ -340,14 +347,12 @@ const App = () => {
                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                    <input placeholder="Rechercher..." className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
                 </div>
-                {/* MENU DEROULANT TRI */}
                 <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer">
                     <option value="date">📅 Date (Récent)</option>
                     <option value="alpha">🔤 Alphabétique</option>
                 </select>
              </div>
 
-             {/* VUE */}
              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px]">
                 {viewMode === 'list' ? (
                    <div className="overflow-x-auto">
@@ -357,8 +362,9 @@ const App = () => {
                            <th className="p-4">Entreprise</th>
                            <th className="p-4">Poste</th>
                            <th className="p-4">Statut</th>
-                           <th className="p-4">Postulé le</th>
-                           <th className="p-4">Relance (J+15)</th>
+                           <th className="p-4">Infos / Contact</th>
+                           <th className="p-4 text-center">Relance (J+15)</th>
+                           <th className="p-4 text-center">Fait ?</th>
                            <th className="p-4 text-right">Action</th>
                          </tr>
                        </thead>
@@ -368,8 +374,22 @@ const App = () => {
                               <td className="p-4 font-bold text-[#0f1f41]">{app.company}</td>
                               <td className="p-4 text-gray-600">{app.role}</td>
                               <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-medium border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span></td>
-                              <td className="p-4 text-gray-500">{new Date(app.date).toLocaleDateString('fr-FR')}</td>
-                              <td className="p-4 text-orange-600 font-medium text-xs flex items-center gap-1"><Calendar size={12}/> {calculateRelance(app.date)}</td>
+                              <td className="p-4">
+                                {app.contact_email ? (
+                                    <div className="flex flex-col text-xs">
+                                        <span className="font-bold text-gray-700">{app.location}</span>
+                                        <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline">{app.contact_email}</a>
+                                    </div>
+                                ) : <span className="text-gray-400 text-xs">{app.location || "-"}</span>}
+                              </td>
+                              <td className="p-4 text-center">
+                                <span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 line-through opacity-50' : 'bg-orange-50 text-orange-600'}`}>
+                                    {calculateRelance(app.date)}
+                                </span>
+                              </td>
+                              <td className="p-4 text-center">
+                                <input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600 rounded"/>
+                              </td>
                               <td className="p-4 text-right">
                                  <button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button>
                                  <button onClick={()=>{setNewApp(app); setEditingId(app.id);}} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button>
@@ -387,13 +407,16 @@ const App = () => {
                            <h3 className="font-bold text-xs uppercase text-gray-500 mb-3 flex justify-between">{status} <span className="bg-white border px-1.5 rounded text-gray-400">{filteredApps.filter(a=>a.status===status).length}</span></h3>
                            <div className="flex flex-col gap-2">
                              {filteredApps.filter(a=>a.status===status).map(app => (
-                               <div key={app.id} className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={()=>{setNewApp(app); setEditingId(app.id);}}>
+                               <div key={app.id} className={`bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${app.relanceDone ? 'opacity-60 grayscale' : ''}`} onClick={()=>{setNewApp(app); setEditingId(app.id);}}>
                                   <div className="flex justify-between items-start">
                                     <div className="font-bold text-[#0f1f41]">{app.company}</div>
                                     {app.lm_url && <FileText size={12} className="text-blue-400"/>}
                                   </div>
                                   <div className="text-xs text-gray-500 mb-2">{app.role}</div>
-                                  <div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">Postulé le {new Date(app.date).toLocaleDateString()}</div>
+                                  <div className="flex justify-between items-end">
+                                     <div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">J+15: {calculateRelance(app.date)}</div>
+                                     {app.relanceDone && <CheckCircle size={14} className="text-green-500"/>}
+                                  </div>
                                </div>
                              ))}
                            </div>
@@ -406,9 +429,8 @@ const App = () => {
         </div>
       </div>
       
-      {/* FOOTER */}
       <footer className="bg-white border-t p-6 text-center text-sm text-gray-400">
-        <p>© 2026 - Développé avec <Heart size={10} className="inline text-red-400"/> par Sheryne OUARGHI-MHIRI / sheryne.ouarghi.pro@gmail.com</p>
+        <p>© 2026 - Développé avec <Heart size={10} className="inline text-red-400"/> par Sheryne OUARGHI-MHIRI/ sheryne.ouarghi.pro@gmail.com</p>
       </footer>
     </div>
   );
