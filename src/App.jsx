@@ -4,13 +4,12 @@ import {
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
   Search, Pencil, X, Mail, AlertTriangle, ExternalLink, FileText, 
   Upload, FileCheck, List, LogOut, User, Lock, LayoutGrid,
-  CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, Link as LinkIcon
+  CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, Link as LinkIcon, Star, Check
 } from 'lucide-react';
 
 // 👇 REMETS TES CLÉS SUPABASE ICI
 const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
-
 
 // Sécurité
 const safeSupabase = () => {
@@ -31,81 +30,66 @@ const JOB_BOARDS = [
   { name: 'MyJobGlasses', url: 'https://www.myjobglasses.com/', color: 'text-pink-600 border-pink-600 hover:bg-pink-600 hover:text-white' },
 ];
 
-// --- MODAL RGPD & EXPORT ---
-const LegalModal = ({ onClose, onExport, onDeleteAccount }) => (
+// --- MODAL RGPD ---
+const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
     <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
       <div className="flex justify-between items-center mb-6 border-b pb-4">
         <h2 className="text-xl font-bold text-[#0f1f41] flex items-center gap-2"><ShieldCheck className="text-blue-600"/> Données & Confidentialité (RGPD)</h2>
         <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full"><X size={24}/></button>
       </div>
+      
       <div className="space-y-6 text-sm text-gray-700">
-        <section><h3 className="font-bold text-lg mb-2 text-gray-900">1. Vos Droits</h3><p>Conformément au RGPD, vous disposez d'un droit d'accès, de portabilité et d'effacement de vos données.</p></section>
-        <section className="bg-blue-50 p-4 rounded-lg border border-blue-100"><h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Download size={16}/> Portabilité</h3><p className="mb-3">Télécharger l'intégralité de vos candidatures au format CSV.</p><button onClick={onExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 flex items-center gap-2">Télécharger mes données (.csv)</button></section>
-        <section className="bg-red-50 p-4 rounded-lg border border-red-100"><h3 className="font-bold text-red-900 mb-2 flex items-center gap-2"><Trash2 size={16}/> Zone de Danger</h3><p className="mb-3">Action irréversible : suppression du compte et des données.</p><button onClick={() => { if(window.confirm("ES-TU SÛR ? Tout sera effacé définitivement.")) onDeleteAccount(); }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700">Supprimer mon compte</button></section>
-        <section className="text-xs text-gray-500 mt-4 border-t pt-4"><p><strong>Éditeur :</strong> Sheryne OUARGHI-MHIRI (Projet Étudiant)</p><p><strong>Hébergement :</strong> Vercel Inc. / Supabase (Europe/USA)</p><p><strong>Contact :</strong> sheryne.ouarghi.pro@gmail.com</p></section>
+        <section>
+            <h3 className="font-bold text-lg mb-2 text-gray-900">1. Présentation & Objectif</h3>
+            <p><strong>Suivi Alternance</strong> est une application développée par <strong>Sheryne OUARGHI-MHIRI</strong>.</p>
+            <p>Son but est d'aider les étudiants à structurer leur recherche d'emploi, centraliser leurs documents (CVs) et ne jamais oublier une relance.</p>
+        </section>
+
+        <section>
+            <h3 className="font-bold text-lg mb-2 text-gray-900">2. Vos Droits (RGPD)</h3>
+            <p>Conformément au Règlement Général sur la Protection des Données, nous garantissons :</p>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li><strong>Confidentialité :</strong> Vos données sont privées. Grâce à la sécurité "Row Level Security", aucun autre utilisateur ne peut voir vos candidatures.</li>
+                <li><strong>Droit à l'oubli :</strong> Vous pouvez supprimer votre compte et toutes ses données à tout moment.</li>
+                <li><strong>Portabilité :</strong> Vous pouvez récupérer vos données sous format CSV.</li>
+            </ul>
+        </section>
+
+        {!isAuthScreen && (
+            <>
+                <section className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Download size={16}/> Portabilité</h3>
+                    <p className="mb-3">Télécharger l'intégralité de vos candidatures au format CSV.</p>
+                    <button onClick={onExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 flex items-center gap-2 text-xs">Télécharger (.csv)</button>
+                </section>
+
+                <section className="bg-red-50 p-4 rounded-lg border border-red-100">
+                    <h3 className="font-bold text-red-900 mb-2 flex items-center gap-2"><Trash2 size={16}/> Zone de Danger</h3>
+                    <p className="mb-3">Action irréversible : suppression du compte et des données.</p>
+                    <button onClick={() => { if(window.confirm("ES-TU SÛR ? Tout sera effacé définitivement.")) onDeleteAccount(); }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700 text-xs">Supprimer mon compte</button>
+                </section>
+            </>
+        )}
+
+        <section className="text-xs text-gray-500 mt-4 border-t pt-4">
+            <p><strong>Éditeur :</strong> Sheryne OUARGHI-MHIRI</p>
+            <p><strong>Hébergement :</strong> Vercel Inc. (Frontend) / Supabase (Base de données)</p>
+            <p><strong>Contact :</strong> sheryne.ouarghi.pro@gmail.com</p>
+        </section>
       </div>
     </div>
   </div>
 );
 
-// --- COMPOSANT ROUTINE ---
-const DailyRoutine = () => {
-  const [checks, setChecks] = useState({});
-  const today = new Date().toLocaleDateString('fr-FR');
-
-  useEffect(() => {
-    try {
-        const saved = JSON.parse(localStorage.getItem('dailyRoutine') || '{}');
-        if (saved.date !== today) {
-          setChecks({}); 
-          localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: {} }));
-        } else {
-          setChecks(saved.checks || {});
-        }
-    } catch(e) { console.error("Erreur routine", e); }
-  }, [today]);
-
-  const toggleCheck = (siteName) => {
-    const newChecks = { ...checks, [siteName]: !checks[siteName] };
-    setChecks(newChecks);
-    localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: newChecks }));
-  };
-
-  const progress = Math.round((Object.values(checks).filter(Boolean).length / JOB_BOARDS.length) * 100);
-
-  return (
-    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="font-bold flex items-center gap-2 text-gray-800">
-            <RefreshCw size={18} className={progress === 100 ? "text-green-500" : "text-blue-600"}/> 
-            Routine du Matin <span className="text-xs font-normal text-gray-400">({today})</span>
-        </h3>
-        <div className="text-xs font-bold text-gray-500">{progress}% fait</div>
-      </div>
-      <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
-        <div className={`h-2 rounded-full transition-all duration-500 ${progress === 100 ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${progress}%` }}></div>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {JOB_BOARDS.map(site => (
-          <button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>
-            {checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-current"></div>}
-            {site.name}
-            <a href={site.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="ml-1 opacity-70 hover:opacity-100"><ExternalLink size={10}/></a>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// --- ECRAN AUTH ---
+// --- ECRAN D'ACCUEIL (LANDING PAGE) ---
 const AuthScreen = ({ supabase }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showLegal, setShowLegal] = useState(false);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -120,22 +104,79 @@ const AuthScreen = ({ supabase }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full text-center">
-        <div className="w-24 h-24 mx-auto mb-4 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden relative">
-             <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} alt="Logo" className="w-full h-full object-contain z-10 relative"/>
-             <Briefcase className="text-blue-500 absolute opacity-20" size={40}/>
+    <div className="min-h-screen bg-white flex flex-col md:flex-row font-sans">
+      
+      {/* GAUCHE : PRÉSENTATION */}
+      <div className="md:w-1/2 bg-[#0f1f41] text-white p-8 md:p-12 flex flex-col justify-between">
+        <div>
+            <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-2">
+                    <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} alt="Logo" className="w-full h-full object-contain"/>
+                    <Briefcase className="text-[#0f1f41] absolute opacity-0" size={24}/>
+                </div>
+                <span className="text-2xl font-bold tracking-tight">Suivi Alternance</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+                Ne perdez plus le fil de vos <span className="text-[#4dabf7]">candidatures</span>.
+            </h1>
+            
+            <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+                Une application conçue par <strong>Sheryne OUARGHI-MHIRI</strong> pour aider les étudiants à structurer leur recherche d'emploi. Centralisez, relancez, décrochez votre alternance.
+            </p>
+
+            <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                    <div className="bg-blue-500/20 p-2 rounded-lg"><Check size={20} className="text-blue-400"/></div>
+                    <span>Tableau de bord intelligent & Relances J+15</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="bg-purple-500/20 p-2 rounded-lg"><Upload size={20} className="text-purple-400"/></div>
+                    <span>Stockage centralisé de vos CVs (ATS & Design)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="bg-green-500/20 p-2 rounded-lg"><ShieldCheck size={20} className="text-green-400"/></div>
+                    <span>100% Sécurisé & Conforme RGPD</span>
+                </div>
+            </div>
         </div>
-        <h1 className="text-2xl font-bold mb-2 text-gray-800">Suivi Alternance</h1>
-        <p className="text-gray-500 text-sm mb-6">{isSignUp ? "Créer un compte" : "Connexion à ton espace"}</p>
-        <form onSubmit={handleAuth} className="space-y-4">
-            <input type="email" placeholder="Email" className="w-full px-4 py-2 border rounded-lg" value={email} onChange={e => setEmail(e.target.value)} required />
-            <input type="password" placeholder="Mot de passe" className="w-full px-4 py-2 border rounded-lg" value={password} onChange={e => setPassword(e.target.value)} required />
-            <button disabled={loading} className="w-full bg-[#005792] hover:bg-[#004270] text-white font-bold py-2 rounded-lg transition-colors">{loading ? '...' : (isSignUp ? "S'inscrire" : "Se connecter")}</button>
-        </form>
-        {message && <div className="mt-4 p-2 bg-yellow-50 text-yellow-700 text-sm rounded">{message}</div>}
-        <button onClick={() => setIsSignUp(!isSignUp)} className="mt-4 text-sm text-blue-600 hover:underline">{isSignUp ? "J'ai déjà un compte" : "Créer un compte"}</button>
+
+        <div className="mt-12 md:mt-0 pt-6 border-t border-gray-700">
+            <button onClick={() => setShowLegal(true)} className="text-sm text-gray-400 hover:text-white underline transition-colors">
+                Mentions Légales & Politique de Confidentialité
+            </button>
+            <p className="text-xs text-gray-500 mt-2">© 2026 - Projet Étudiant</p>
+        </div>
       </div>
+
+      {/* DROITE : CONNEXION */}
+      <div className="md:w-1/2 bg-gray-50 flex items-center justify-center p-6">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">{isSignUp ? "Créer un compte" : "Bon retour !"}</h2>
+            <p className="text-center text-gray-500 text-sm mb-6">Connectez-vous pour accéder à votre espace.</p>
+            
+            <form onSubmit={handleAuth} className="space-y-4">
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email Étudiant / Perso</label>
+                    <input type="email" placeholder="exemple@ecole.fr" className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={email} onChange={e => setEmail(e.target.value)} required />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Mot de passe</label>
+                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={password} onChange={e => setPassword(e.target.value)} required />
+                </div>
+                <button disabled={loading} className="w-full bg-[#005792] hover:bg-[#004270] text-white font-bold py-3 rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">{loading ? 'Chargement...' : (isSignUp ? "Commencer l'aventure" : "Se connecter")}</button>
+            </form>
+            
+            {message && <div className="mt-4 p-3 bg-blue-50 text-blue-700 text-sm rounded-lg text-center font-medium">{message}</div>}
+            
+            <div className="mt-6 text-center border-t pt-4">
+                <p className="text-sm text-gray-600 mb-2">{isSignUp ? "Déjà un compte ?" : "Pas encore inscrit ?"}</p>
+                <button onClick={() => setIsSignUp(!isSignUp)} className="text-sm text-[#005792] font-bold hover:underline">{isSignUp ? "Se connecter" : "Créer un compte gratuitement"}</button>
+            </div>
+        </div>
+      </div>
+
+      {showLegal && <LegalModal onClose={() => setShowLegal(false)} isAuthScreen={true} />}
     </div>
   );
 };
@@ -148,7 +189,6 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [showLegal, setShowLegal] = useState(false);
   
-  // UI States
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("date");
   const [viewMode, setViewMode] = useState("list"); 
@@ -270,7 +310,6 @@ const App = () => {
   const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], lm_url: "", relanceDone: false, isFavorite: false }); setFileLM(null); setEditingId(null); };
   const calculateRelance = (d) => { if (!d) return "-"; const date = new Date(d); date.setDate(date.getDate() + 15); return date.toLocaleDateString('fr-FR'); };
 
-  // --- LOGIQUE TRI & AUTO-COMPLETION ---
   const uniqueCompanies = [...new Set(applications.map(a => a.company))];
   const uniqueLocations = [...new Set(applications.map(a => a.location))];
 
@@ -281,6 +320,22 @@ const App = () => {
         if (sortType === 'alpha') return a.company.localeCompare(b.company);
         return new Date(b.date) - new Date(a.date);
     });
+
+  // --- COMPOSANT ROUTINE ---
+  const DailyRoutine = () => {
+    const [checks, setChecks] = useState({});
+    const today = new Date().toLocaleDateString('fr-FR');
+    useEffect(() => { try { const saved = JSON.parse(localStorage.getItem('dailyRoutine') || '{}'); if (saved.date !== today) { setChecks({}); localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: {} })); } else { setChecks(saved.checks || {}); } } catch(e) {} }, [today]);
+    const toggleCheck = (siteName) => { const newChecks = { ...checks, [siteName]: !checks[siteName] }; setChecks(newChecks); localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: newChecks })); };
+    const progress = Math.round((Object.values(checks).filter(Boolean).length / JOB_BOARDS.length) * 100);
+    return (
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+        <div className="flex justify-between items-center mb-3"><h3 className="font-bold flex items-center gap-2 text-gray-800"><RefreshCw size={18} className={progress === 100 ? "text-green-500" : "text-blue-600"}/> Routine du Matin <span className="text-xs font-normal text-gray-400">({today})</span></h3><div className="text-xs font-bold text-gray-500">{progress}% fait</div></div>
+        <div className="w-full bg-gray-100 rounded-full h-2 mb-4"><div className={`h-2 rounded-full transition-all duration-500 ${progress === 100 ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${progress}%` }}></div></div>
+        <div className="flex flex-wrap gap-2">{JOB_BOARDS.map(site => (<button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>{checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-current"></div>}{site.name}<a href={site.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="ml-1 opacity-70 hover:opacity-100"><ExternalLink size={10}/></a></button>))}</div>
+      </div>
+    );
+  };
 
   if (!supabase) return <div className="p-10 text-red-600 text-center">Clés manquantes</div>;
   if (!session) return <AuthScreen supabase={supabase} />;
@@ -309,44 +364,36 @@ const App = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="space-y-6">
             
-            {/* DOCS STATIQUES */}
+            {/* DOCS */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                <h2 className="font-bold flex items-center gap-2 mb-4 text-[#0f1f41]"><FileCheck className="text-[#005792]"/> Mes Documents</h2>
                <div className="space-y-3">
                   <div className="relative group">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_ats ? 'border-[#00ab65] bg-green-50' : 'border-dashed border-gray-300 hover:border-[#005792] hover:bg-blue-50'}`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full ${profile?.cv_ats ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}><FileText size={18}/></div>
-                        <div><span className="text-sm font-bold text-gray-700 block">CV ATS</span><span className="text-[10px] text-gray-400">{profile?.cv_ats ? "Chargé" : "PDF"}</span></div>
-                      </div>
-                      <Upload size={16} className="text-gray-400"/>
-                      <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'ats')} disabled={uploading}/>
+                      <div className="flex items-center gap-3"><div className={`p-2 rounded-full ${profile?.cv_ats ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}><FileText size={18}/></div><div><span className="text-sm font-bold text-gray-700 block">CV ATS</span><span className="text-[10px] text-gray-500 font-medium">{profile?.cv_ats ? "Cliquer pour remplacer" : "Ajouter un PDF"}</span></div></div>
+                      {uploading ? <span className="text-xs">...</span> : (profile?.cv_ats ? <RefreshCw size={16} className="text-green-600"/> : <Upload size={16} className="text-gray-400"/>)}
+                      <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'ats')} disabled={uploading}/>
                     </label>
-                    {profile?.cv_ats && <a href={profile.cv_ats} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#00ab65] hover:underline z-10">Voir</a>}
+                    {profile?.cv_ats && <a href={profile.cv_ats} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#00ab65] hover:underline z-10 bg-green-50 px-1 rounded">Voir</a>}
                   </div>
                   <div className="relative group">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_human ? 'border-[#005792] bg-blue-50' : 'border-dashed border-gray-300 hover:border-[#fdbb2d] hover:bg-yellow-50'}`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full ${profile?.cv_human ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}><User size={18}/></div>
-                        <div><span className="text-sm font-bold text-gray-700 block">CV Design</span><span className="text-[10px] text-gray-400">{profile?.cv_human ? "Chargé" : "PDF"}</span></div>
-                      </div>
-                      <Upload size={16} className="text-gray-400"/>
-                      <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'human')} disabled={uploading}/>
+                      <div className="flex items-center gap-3"><div className={`p-2 rounded-full ${profile?.cv_human ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}><User size={18}/></div><div><span className="text-sm font-bold text-gray-700 block">CV Design</span><span className="text-[10px] text-gray-500 font-medium">{profile?.cv_human ? "Cliquer pour remplacer" : "Ajouter un PDF"}</span></div></div>
+                      {uploading ? <span className="text-xs">...</span> : (profile?.cv_human ? <RefreshCw size={16} className="text-[#005792]"/> : <Upload size={16} className="text-gray-400"/>)}
+                      <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'human')} disabled={uploading}/>
                     </label>
-                    {profile?.cv_human && <a href={profile.cv_human} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#005792] hover:underline z-10">Voir</a>}
+                    {profile?.cv_human && <a href={profile.cv_human} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#005792] hover:underline z-10 bg-blue-50 px-1 rounded">Voir</a>}
                   </div>
                </div>
             </div>
 
-            {/* FORMULAIRE AVEC AUTO-COMPLETE */}
+            {/* FORMULAIRE */}
             <div className={`bg-white p-5 rounded-xl shadow-sm border border-gray-200 ${editingId ? 'ring-2 ring-orange-200' : ''}`}>
                <div className="flex justify-between items-center mb-4">
                  <h2 className="font-bold text-[#0f1f41]">{editingId ? "Modifier" : "Nouvelle Candidature"}</h2>
                  {editingId && <button onClick={resetForm}><X size={16}/></button>}
                </div>
-               
                <form onSubmit={handleSubmit} className="space-y-3">
-                  {/* Datalists pour auto-complétion */}
                   <datalist id="companies">{uniqueCompanies.map(c => <option key={c} value={c}/>)}</datalist>
                   <datalist id="locations">{uniqueLocations.map(l => <option key={l} value={l}/>)}</datalist>
 
@@ -377,15 +424,11 @@ const App = () => {
                         </div>
                      </div>
                   )}
-                  
                   <label className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-dashed border-gray-300 p-2 rounded-lg text-xs text-gray-500 hover:bg-gray-100">
                      <FileText size={14}/> {newApp.lm_url ? "Lettre jointe (Changer)" : "Joindre Lettre de motiv'"}
                      <input type="file" className="hidden" onChange={(e) => setFileLM(e.target.files[0])} />
                   </label>
-                  
-                  <button disabled={uploading} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : 'bg-[#005792] hover:bg-[#004270]'}`}>
-                    {uploading ? "..." : (editingId ? "Sauvegarder" : "Ajouter la candidature")}
-                  </button>
+                  <button disabled={uploading} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : 'bg-[#005792] hover:bg-[#004270]'}`}>{uploading ? "..." : (editingId ? "Sauvegarder" : "Ajouter la candidature")}</button>
                </form>
             </div>
           </div>
@@ -400,11 +443,7 @@ const App = () => {
                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                    <input placeholder="Rechercher..." className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
                 </div>
-                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer">
-                    <option value="favorite">❤️ Favoris</option>
-                    <option value="date">📅 Date (Récent)</option>
-                    <option value="alpha">🔤 Alphabétique</option>
-                </select>
+                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer"><option value="favorite">❤️ Favoris</option><option value="date">📅 Date (Récent)</option><option value="alpha">🔤 Alphabétique</option></select>
              </div>
 
              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px]">
@@ -424,11 +463,7 @@ const App = () => {
                               <td className="p-4">
                                 <div className="flex flex-col text-xs">
                                    {app.location && <span className="font-bold text-gray-700 mb-1 flex items-center gap-1"><MapPin size={10}/> {app.location}</span>}
-                                   {app.source === 'Contact direct' ? (
-                                      app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1"><Mail size={10}/> {app.contact_email}</a> : null
-                                   ) : (
-                                      app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-xs font-bold"><ExternalLink size={10}/> Annonce</a> : null
-                                   )}
+                                   {app.source === 'Contact direct' ? (app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1"><Mail size={10}/> {app.contact_email}</a> : null) : (app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-xs font-bold"><ExternalLink size={10}/> Annonce</a> : null)}
                                 </div>
                               </td>
                               <td className="p-4 text-center"><span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 line-through opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span></td>
@@ -448,10 +483,7 @@ const App = () => {
                            <div className="flex flex-col gap-2">
                              {filteredApps.filter(a=>a.status===status).map(app => (
                                <div key={app.id} className={`bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${app.relanceDone ? 'opacity-60 grayscale' : ''}`} onClick={()=>{setNewApp(app); setEditingId(app.id);}}>
-                                  <div className="flex justify-between items-start">
-                                      <div className="font-bold text-[#0f1f41]">{app.company}</div>
-                                      <button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={14} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button>
-                                  </div>
+                                  <div className="flex justify-between items-start"><div className="font-bold text-[#0f1f41]">{app.company}</div><button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={14} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button></div>
                                   <div className="text-xs text-gray-500 mb-2">{app.role}</div>
                                   <div className="flex justify-between items-end"><div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">J+15: {calculateRelance(app.date)}</div>{app.relanceDone && <CheckCircle size={14} className="text-green-500"/>}</div>
                                </div>
@@ -472,7 +504,7 @@ const App = () => {
         <button onClick={() => setShowLegal(true)} className="text-xs text-gray-400 hover:text-gray-600 underline">Mentions Légales & RGPD</button>
       </footer>
 
-      {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={exportToCSV} onDeleteAccount={deleteAccountData} />}
+      {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={exportToCSV} onDeleteAccount={deleteAccountData} isAuthScreen={false} />}
     </div>
   );
 };
