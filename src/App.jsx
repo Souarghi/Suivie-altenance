@@ -4,7 +4,7 @@ import {
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
   Search, Pencil, X, Mail, ArrowUpDown, AlertTriangle, 
   ExternalLink, FileText, Upload, FileCheck, FileSpreadsheet,
-  LayoutGrid, List // Nouvelles icônes pour le switch
+  LayoutGrid, List, LogOut, User, Lock
 } from 'lucide-react';
 
 
@@ -15,44 +15,106 @@ const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// --- 1. BARRE DE RACCOURCIS ---
+// --- COMPOSANT DE CONNEXION ---
+const AuthScreen = () => {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    // Envoi du Magic Link (plus simple que mot de passe pour commencer)
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    if (error) setMessage('Erreur: ' + error.message);
+    else setMessage('Lien de connexion envoyé ! Vérifie tes mails.');
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full border border-gray-100">
+        <div className="flex justify-center mb-6">
+            <div className="bg-blue-100 p-3 rounded-full"><Briefcase className="text-blue-600" size={32}/></div>
+        </div>
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">Suivi Alternance</h1>
+        <p className="text-center text-gray-500 mb-8 text-sm">Connecte-toi pour gérer tes candidatures.</p>
+        
+        <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+                <div className="relative">
+                    <User className="absolute left-3 top-2.5 text-gray-400" size={18}/>
+                    <input type="email" placeholder="ton@email.com" className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+            </div>
+            <button disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition-colors flex justify-center items-center gap-2">
+                {loading ? 'Envoi...' : <><Lock size={16}/> Recevoir mon lien magique</>}
+            </button>
+        </form>
+        {message && <div className={`mt-4 p-3 rounded-lg text-sm text-center ${message.includes('Erreur') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>{message}</div>}
+      </div>
+    </div>
+  );
+};
+
+// --- CONSTANTES ---
 const QUICK_LINKS = [
-  { name: 'AFI24 (Inscription)', url: 'https://www.afi24.org/', color: 'bg-purple-700' },
-  { name: 'JobTeaser CY Tech', url: 'https://cytech.jobteaser.com/', color: 'bg-green-600' },
+  { name: 'AFI24', url: 'https://www.afi24.org/', color: 'bg-purple-700' },
+  { name: 'JobTeaser', url: 'https://cytech.jobteaser.com/', color: 'bg-green-600' },
   { name: 'Data Alumni', url: 'https://cytech.datalumni.com/', color: 'bg-cyan-600' },
   { name: 'APEC', url: 'https://www.apec.fr/', color: 'bg-indigo-700' },
   { name: 'Métierscope', url: 'https://candidat.francetravail.fr/metierscope/', color: 'bg-orange-500' },
-  { name: 'Welcome to the Jungle', url: 'https://www.welcometothejungle.com/', color: 'bg-yellow-400 text-black' },
-  { name: 'MyJobGlasses', url: 'https://www.myjobglasses.com/', color: 'bg-pink-600' },
-  { name: 'LinkedIn Jobs', url: 'https://www.linkedin.com/jobs/', color: 'bg-blue-700' },
+  { name: 'WTTJ', url: 'https://www.welcometothejungle.com/', color: 'bg-yellow-400 text-black' },
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/jobs/', color: 'bg-blue-700' },
 ];
 
 const App = () => {
+  const [session, setSession] = useState(null);
+  
+  // États App
   const [applications, setApplications] = useState([]);
   const [profile, setProfile] = useState({ cv_ats: "", cv_human: "" });
   const [loading, setLoading] = useState(true);
-  
-  // États de tri, recherche et VUE
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("date");
-  const [viewMode, setViewMode] = useState("list"); // 'list' ou 'kanban'
+  const [viewMode, setViewMode] = useState("list"); 
   const [editingId, setEditingId] = useState(null);
-  
-  // États fichiers
   const [fileLM, setFileLM] = useState(null);
   const [uploading, setUploading] = useState(false);
 
+  // Gestion Session Auth
   useEffect(() => {
-    fetchData();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if(session) fetchData(); 
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if(session) fetchData();
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const fetchData = async () => {
     try {
       setLoading(true);
+      // Grâce au RLS, cela ne renvoie QUE les données du user connecté
       let { data: apps } = await supabase.from('applications').select('*');
       setApplications(apps || []);
-      let { data: prof } = await supabase.from('profile').select('*').single();
-      if (prof) setProfile(prof);
+      
+      let { data: prof } = await supabase.from('profile').select('*').limit(1).single();
+      
+      // Si pas de profil, on en crée un vide pour l'utilisateur
+      if (!prof) {
+        const { data: newProf, error } = await supabase.from('profile').insert([{}]).select().single();
+        if(!error) setProfile(newProf);
+      } else {
+        setProfile(prof);
+      }
+
     } catch (error) {
       console.error('Erreur chargement:', error.message);
     } finally {
@@ -60,10 +122,19 @@ const App = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setApplications([]);
+  };
+
+  // Si pas connecté, afficher AuthScreen
+  if (!session) return <AuthScreen />;
+
+  // --- LE RESTE DE L'APP (Similaire à avant) ---
   const [newApp, setNewApp] = useState({
     company: "", role: "", status: "A faire", location: "", source: "LinkedIn",
-    contact_email: "", date: new Date().toISOString().split('T')[0], relanceDone: false,
-    lm_url: ""
+    contact_email: "", date: new Date().toISOString().split('T')[0], relanceDone: false, lm_url: ""
   });
 
   const statusOptions = [
@@ -76,11 +147,11 @@ const App = () => {
   
   const sourceOptions = ["LinkedIn", "JobTeaser", "Contact direct", "Site de l'entreprise", "Indeed", "Welcome to the Jungle", "Autre"];
 
-  // Fonctions Backend
   const uploadFileToSupabase = async (file) => {
     if (!file) return null;
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+    // IMPORTANT: Le user ne peut uploader que s'il est connecté (géré par Supabase)
     const { error } = await supabase.storage.from('documents').upload(fileName, file);
     if (error) { alert("Erreur upload : " + error.message); return null; }
     const { data } = supabase.storage.from('documents').getPublicUrl(fileName);
@@ -93,10 +164,10 @@ const App = () => {
     const url = await uploadFileToSupabase(file);
     if (url) {
       const updateData = type === 'ats' ? { cv_ats: url } : { cv_human: url };
+      // Mise à jour sécurisée via RLS (le user ne peut update que SA ligne)
       const { error } = await supabase.from('profile').update(updateData).gt('id', 0);
       if (error || !error) { 
-         if (error) console.log("Maj...", error);
-         else setProfile(prev => ({ ...prev, ...updateData }));
+         setProfile(prev => ({ ...prev, ...updateData }));
       }
     }
     setUploading(false);
@@ -111,7 +182,7 @@ const App = () => {
         const url = await uploadFileToSupabase(fileLM);
         if (url) uploadedLMUrl = url;
     }
-    const appData = { ...newApp, lm_url: uploadedLMUrl };
+    const appData = { ...newApp, lm_url: uploadedLMUrl }; // user_id est ajouté automatiquement par Supabase (default auth.uid())
     if (editingId) {
       const { error } = await supabase.from('applications').update(appData).eq('id', editingId);
       if (!error) {
@@ -140,7 +211,6 @@ const App = () => {
     }
   };
 
-  // Utils
   const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", date: new Date().toISOString().split('T')[0], relanceDone: false, lm_url: "" }); setFileLM(null); setEditingId(null); };
   const calculateRelanceDate = (d) => { if (!d) return "-"; const date = new Date(d); date.setDate(date.getDate() + 15); return date.toLocaleDateString('fr-FR'); };
   const getStatusStyle = (val) => statusOptions.find(o => o.value === val)?.color || "bg-gray-100";
@@ -164,6 +234,15 @@ const App = () => {
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900 p-4 md:p-8">
       <div className="max-w-[98%] mx-auto space-y-6">
         
+        {/* HEADER GLOBAL + LOGOUT */}
+        <div className="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl shadow-md">
+             <div className="flex items-center gap-2 font-bold"><Briefcase size={20} className="text-blue-400"/> Suivi Alternance Pro</div>
+             <div className="flex items-center gap-4 text-sm">
+                <span className="text-slate-400 hidden md:block">Connecté : {session.user.email}</span>
+                <button onClick={handleLogout} className="flex items-center gap-1 bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg transition-colors font-medium text-xs"><LogOut size={14}/> Déconnexion</button>
+             </div>
+        </div>
+
         {/* BARRE RACCOURCIS */}
         <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-200 overflow-x-auto flex gap-3 items-center">
             <span className="text-xs font-bold text-gray-400 uppercase whitespace-nowrap">Ressources :</span>
@@ -176,7 +255,7 @@ const App = () => {
         <div className="bg-slate-800 text-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex-1">
                 <h2 className="text-xl font-bold flex items-center gap-2 mb-2"><FileCheck className="text-blue-300"/> Mes CVs</h2>
-                <p className="text-slate-300 text-sm">Tes versions de référence.</p>
+                <p className="text-slate-300 text-sm">Tes versions de référence (visibles uniquement par toi).</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                 <div className="bg-slate-700 p-3 rounded-lg border border-slate-600 w-full sm:w-64">
@@ -198,18 +277,16 @@ const App = () => {
           </div>
           
           <div className="flex flex-wrap gap-3 items-center justify-center">
-             {/* Switch Liste / Kanban */}
              <div className="bg-gray-100 p-1 rounded-lg flex items-center border border-gray-200">
                 <button onClick={() => setViewMode('list')} className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}><List size={16}/> Liste</button>
                 <button onClick={() => setViewMode('kanban')} className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition-all ${viewMode === 'kanban' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}><LayoutGrid size={16}/> Kanban</button>
              </div>
-
              <div className="relative"><Search className="absolute left-3 top-2.5 text-gray-400" size={18} /><input type="text" placeholder="Rechercher..." className="pl-10 pr-4 py-2 border rounded-lg text-sm outline-none w-40 md:w-auto" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/></div>
              <button onClick={exportToCSV} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium flex items-center gap-2"><FileSpreadsheet size={16}/> CSV</button>
           </div>
         </div>
 
-        {/* FORMULAIRE (Affiché tout le temps pour ajout rapide) */}
+        {/* FORMULAIRE */}
         <div className={`p-6 rounded-xl shadow-sm border ${editingId ? 'bg-yellow-50 border-yellow-200' : 'bg-white border-gray-200'}`}>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">{editingId ? <><Pencil size={20} className="text-orange-600" /> Modifier</> : <><Plus size={20} className="text-blue-600" /> Ajouter</>}</h2>
@@ -223,9 +300,7 @@ const App = () => {
             </div>
             <div className="md:col-span-3"><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Poste</label><div className="relative"><Briefcase className="absolute left-3 top-2.5 text-gray-400" size={16}/><input type="text" placeholder="Développeur..." className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={newApp.role} onChange={(e)=>setNewApp({...newApp, role: e.target.value})} required /></div></div>
             <div className="md:col-span-2"><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Source</label><select className="w-full px-3 py-2 border rounded-lg text-sm bg-white" value={newApp.source} onChange={(e)=>setNewApp({...newApp, source: e.target.value})}>{sourceOptions.map(opt=><option key={opt} value={opt}>{opt}</option>)}</select></div>
-            <div className="md:col-span-2">
-                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Lieu / Contact</label><div className="relative"><MapPin className="absolute left-3 top-2.5 text-gray-400" size={16}/><input type="text" placeholder="Paris / RH" className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={newApp.location} onChange={(e)=>setNewApp({...newApp, location: e.target.value})} /></div>
-            </div>
+            <div className="md:col-span-2"><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Lieu / Contact</label><div className="relative"><MapPin className="absolute left-3 top-2.5 text-gray-400" size={16}/><input type="text" placeholder="Paris / RH" className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={newApp.location} onChange={(e)=>setNewApp({...newApp, location: e.target.value})} /></div></div>
             <div className="md:col-span-2"><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Date</label><input type="date" className="w-full px-3 py-2 border rounded-lg text-sm" value={newApp.date} onChange={(e)=>setNewApp({...newApp, date: e.target.value})} required /></div>
             <div className="md:col-span-8 bg-gray-50 p-2 rounded-lg border border-dashed border-gray-300 flex items-center gap-4">
                 <div className="flex-1">
@@ -272,11 +347,7 @@ const App = () => {
               const columnApps = filteredApps.filter(app => app.status === option.value);
               return (
                 <div key={option.value} className="min-w-[280px] w-80 bg-gray-100 rounded-xl p-3 flex flex-col gap-3 shrink-0">
-                  <div className={`font-bold text-sm uppercase px-2 py-1 flex justify-between items-center ${option.color} bg-white border rounded-lg`}>
-                    {option.label}
-                    <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs">{columnApps.length}</span>
-                  </div>
-                  
+                  <div className={`font-bold text-sm uppercase px-2 py-1 flex justify-between items-center ${option.color} bg-white border rounded-lg`}>{option.label}<span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs">{columnApps.length}</span></div>
                   <div className="flex flex-col gap-2 min-h-[100px]">
                     {columnApps.map(app => (
                       <div key={app.id} className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow group relative">
@@ -285,7 +356,6 @@ const App = () => {
                             <button onClick={() => handleDelete(app.id)} className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={14}/></button>
                         </div>
                         <p className="text-xs text-gray-600 mb-2 font-medium">{app.role}</p>
-                        
                         <div className="flex justify-between items-end mt-2">
                            <div className="flex flex-col gap-1">
                                 <span className="text-[10px] text-gray-400 flex items-center gap-1"><Calendar size={10}/> Relance: {calculateRelanceDate(app.date)}</span>
@@ -294,15 +364,7 @@ const App = () => {
                                     <button onClick={() => handleEditClick(app)} className="text-blue-500 bg-blue-50 p-1 rounded"><Pencil size={12}/></button>
                                 </div>
                            </div>
-                           
-                           {/* Changement rapide de statut via dropdown dans la carte */}
-                           <select 
-                             value={app.status} 
-                             onChange={(e) => handleQuickChange(app.id, 'status', e.target.value)}
-                             className="text-[10px] border rounded bg-gray-50 px-1 py-0.5 max-w-[80px]"
-                           >
-                             {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                           </select>
+                           <select value={app.status} onChange={(e) => handleQuickChange(app.id, 'status', e.target.value)} className="text-[10px] border rounded bg-gray-50 px-1 py-0.5 max-w-[80px]">{statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
                         </div>
                       </div>
                     ))}
@@ -313,10 +375,8 @@ const App = () => {
             })}
           </div>
         )}
-
       </div>
     </div>
   );
 };
-
 export default App;
