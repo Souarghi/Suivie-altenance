@@ -4,21 +4,22 @@ import {
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
   Search, Pencil, X, Mail, AlertTriangle, ExternalLink, FileText, 
   Upload, FileCheck, List, LogOut, User, Lock, LayoutGrid,
-  CheckCircle, RefreshCw, AlertOctagon
+  CheckCircle, RefreshCw, AlertOctagon, Heart 
 } from 'lucide-react';
 
 // 👇 REMETS TES CLÉS SUPABASE ICI
 const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
 
-// Sécurité
+
+// Sécurité : empêche le crash si les clés sont vides
 const safeSupabase = () => {
   if (!supabaseUrl || supabaseUrl.includes('TON_URL')) return null;
   return createClient(supabaseUrl, supabaseKey);
 };
 const supabase = safeSupabase();
 
-// --- DONNÉES & COULEURS ---
+// --- DONNÉES ---
 const JOB_BOARDS = [
   { name: 'LinkedIn', url: 'https://www.linkedin.com/jobs/', color: 'text-[#0077b5] border-[#0077b5] hover:bg-[#0077b5] hover:text-white' },
   { name: 'HelloWork', url: 'https://www.hellowork.com/', color: 'text-[#ff0000] border-[#ff0000] hover:bg-[#ff0000] hover:text-white' },
@@ -30,19 +31,21 @@ const JOB_BOARDS = [
   { name: 'MyJobGlasses', url: 'https://www.myjobglasses.com/', color: 'text-pink-600 border-pink-600 hover:bg-pink-600 hover:text-white' },
 ];
 
-// --- COMPOSANT ROUTINE (CHECKLIST) ---
+// --- COMPOSANT ROUTINE ---
 const DailyRoutine = () => {
   const [checks, setChecks] = useState({});
   const today = new Date().toLocaleDateString('fr-FR');
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('dailyRoutine') || '{}');
-    if (saved.date !== today) {
-      setChecks({}); // Reset le lendemain
-      localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: {} }));
-    } else {
-      setChecks(saved.checks || {});
-    }
+    try {
+        const saved = JSON.parse(localStorage.getItem('dailyRoutine') || '{}');
+        if (saved.date !== today) {
+          setChecks({}); 
+          localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: {} }));
+        } else {
+          setChecks(saved.checks || {});
+        }
+    } catch(e) { console.error("Erreur routine", e); }
   }, [today]);
 
   const toggleCheck = (siteName) => {
@@ -78,7 +81,7 @@ const DailyRoutine = () => {
   );
 };
 
-// --- ECRAN DE CONNEXION ---
+// --- ECRAN AUTH ---
 const AuthScreen = ({ supabase }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -101,7 +104,12 @@ const AuthScreen = ({ supabase }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full text-center">
-        <img src="/logo.png" onError={(e) => e.target.style.display='none'} alt="Logo" className="w-20 h-20 mx-auto mb-4 rounded-xl object-contain"/>
+        {/* LOGO AVEC SÉCURITÉ */}
+        <div className="w-24 h-24 mx-auto mb-4 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden relative">
+             <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} alt="Logo" className="w-full h-full object-contain z-10 relative"/>
+             <Briefcase className="text-blue-500 absolute opacity-20" size={40}/>
+        </div>
+        
         <h1 className="text-2xl font-bold mb-2 text-gray-800">Suivi Alternance</h1>
         <p className="text-gray-500 text-sm mb-6">{isSignUp ? "Créer un compte" : "Connexion à ton espace"}</p>
         <form onSubmit={handleAuth} className="space-y-4">
@@ -116,7 +124,7 @@ const AuthScreen = ({ supabase }) => {
   );
 };
 
-// --- APP PRINCIPALE ---
+// --- APP ---
 const App = () => {
   const [session, setSession] = useState(null);
   const [applications, setApplications] = useState([]);
@@ -131,14 +139,13 @@ const App = () => {
   const [fileLM, setFileLM] = useState(null);
   const [uploading, setUploading] = useState(false);
   
-  // FORMULAIRE
   const [newApp, setNewApp] = useState({ 
     company: "", role: "", status: "A faire", location: "", source: "LinkedIn", 
     contact_email: "", date: new Date().toISOString().split('T')[0], relanceDone: false, lm_url: "" 
   });
 
   const statusOptions = ["A faire", "Postulé", "Entretien", "Accepté", "Refusé"];
-  const sourceOptions = ["LinkedIn", "Indeed", "HelloWork", "Welcome to the Jungle", "JobTeaser", "Contact direct", "Site Entreprise", "Autre"];
+  const sourceOptions = ["LinkedIn", "Indeed", "HelloWork", "WTTJ", "JobTeaser", "Contact direct", "Site Entreprise", "Autre"];
 
   useEffect(() => {
     if (!supabase) return;
@@ -185,9 +192,15 @@ const App = () => {
     setUploading(false);
   };
 
+  const isDuplicate = newApp.company && applications.some(app => 
+      app.company && newApp.company && 
+      app.company.normalize("NFD").toLowerCase().trim() === newApp.company.normalize("NFD").toLowerCase().trim() && 
+      app.id !== editingId
+  );
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isDuplicate && !editingId) return alert("Doublon détecté !"); // Bloque si doublon
+    if (isDuplicate && !editingId) return alert("Doublon détecté !");
     
     setUploading(true);
     let url = newApp.lm_url;
@@ -212,10 +225,8 @@ const App = () => {
     }
   };
 
-  // CHECKBOX RELANCE
   const toggleRelance = async (app) => {
     const newVal = !app.relanceDone;
-    // Optimistic UI update
     setApplications(prev => prev.map(a => a.id === app.id ? { ...a, relanceDone: newVal } : a));
     await supabase.from('applications').update({ relanceDone: newVal }).eq('id', app.id);
   };
@@ -223,11 +234,6 @@ const App = () => {
   const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", date: new Date().toISOString().split('T')[0], lm_url: "", relanceDone: false }); setFileLM(null); setEditingId(null); };
   const calculateRelance = (d) => { if (!d) return "-"; const date = new Date(d); date.setDate(date.getDate() + 15); return date.toLocaleDateString('fr-FR'); };
 
-  // --- LOGIQUE DOUBLON (Fuzzy Search) ---
-  const normalize = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
-  const isDuplicate = newApp.company && applications.some(app => normalize(app.company) === normalize(newApp.company) && app.id !== editingId);
-
-  // --- FILTRES ---
   const filteredApps = applications
     .filter(a => a.company?.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => sortType === 'alpha' ? a.company.localeCompare(b.company) : new Date(b.date) - new Date(a.date));
@@ -242,7 +248,10 @@ const App = () => {
         {/* HEADER */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-             <img src="/logo.png" onError={(e) => e.target.style.display='none'} className="w-10 h-10 rounded-lg object-contain bg-gray-50" alt="Logo"/>
+             <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center relative">
+                <img src="/logo.png" onError={(e) => e.target.style.display='none'} className="w-full h-full object-contain z-10" alt="Logo"/>
+                <Briefcase size={20} className="text-blue-500 absolute opacity-30" />
+             </div>
              <h1 className="font-bold text-xl text-[#0f1f41] hidden md:block">Suivi Alternance</h1>
           </div>
           <div className="flex items-center gap-4">
@@ -251,43 +260,29 @@ const App = () => {
           </div>
         </div>
 
-        {/* CHECKLIST */}
         <DailyRoutine />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* COLONNE GAUCHE */}
           <div className="space-y-6">
-            
-            {/* DOCS */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                <h2 className="font-bold flex items-center gap-2 mb-4 text-[#0f1f41]"><FileCheck className="text-[#005792]"/> Mes Documents</h2>
                <div className="space-y-3">
-                  <div className="relative group">
-                    <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_ats ? 'border-[#00ab65] bg-green-50' : 'border-dashed border-gray-300 hover:border-[#005792] hover:bg-blue-50'}`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full ${profile?.cv_ats ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}><FileText size={18}/></div>
-                        <div><span className="text-sm font-bold text-gray-700 block">CV ATS (Robot)</span><span className="text-[10px] text-gray-400">{profile?.cv_ats ? "Chargé" : "PDF"}</span></div>
-                      </div>
-                      <Upload size={16} className="text-gray-400"/>
-                      <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'ats')} disabled={uploading}/>
-                    </label>
-                    {profile?.cv_ats && <a href={profile.cv_ats} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#00ab65] hover:underline z-10">Voir</a>}
-                  </div>
-                  <div className="relative group">
-                    <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.cv_human ? 'border-[#005792] bg-blue-50' : 'border-dashed border-gray-300 hover:border-[#fdbb2d] hover:bg-yellow-50'}`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full ${profile?.cv_human ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'}`}><User size={18}/></div>
-                        <div><span className="text-sm font-bold text-gray-700 block">CV Design (Humain)</span><span className="text-[10px] text-gray-400">{profile?.cv_human ? "Chargé" : "PDF"}</span></div>
-                      </div>
-                      <Upload size={16} className="text-gray-400"/>
-                      <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], 'human')} disabled={uploading}/>
-                    </label>
-                    {profile?.cv_human && <a href={profile.cv_human} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#005792] hover:underline z-10">Voir</a>}
-                  </div>
+                  {['ats', 'human'].map(type => (
+                    <div key={type} className="relative group">
+                        <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.[`cv_${type}`] ? 'border-[#00ab65] bg-green-50' : 'border-dashed border-gray-300 hover:border-[#005792] hover:bg-blue-50'}`}>
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-full ${profile?.[`cv_${type}`] ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>{type === 'ats' ? <FileText size={18}/> : <User size={18}/>}</div>
+                            <div><span className="text-sm font-bold text-gray-700 block">{type === 'ats' ? 'CV ATS (Robot)' : 'CV Design'}</span><span className="text-[10px] text-gray-400">{profile?.[`cv_${type}`] ? "Chargé" : "PDF"}</span></div>
+                          </div>
+                          <Upload size={16} className="text-gray-400"/>
+                          <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], type)} disabled={uploading}/>
+                        </label>
+                        {profile?.[`cv_${type}`] && <a href={profile[`cv_${type}`]} target="_blank" rel="noreferrer" className="absolute right-12 top-4 text-xs font-bold text-[#00ab65] hover:underline z-10">Voir</a>}
+                    </div>
+                  ))}
                </div>
             </div>
 
-            {/* FORMULAIRE */}
             <div className={`bg-white p-5 rounded-xl shadow-sm border border-gray-200 ${editingId ? 'ring-2 ring-orange-200' : ''}`}>
                <div className="flex justify-between items-center mb-4">
                  <h2 className="font-bold text-[#0f1f41]">{editingId ? "Modifier" : "Nouvelle Candidature"}</h2>
@@ -295,12 +290,7 @@ const App = () => {
                </div>
                
                <form onSubmit={handleSubmit} className="space-y-3">
-                  {/* ALERTE DOUBLON */}
-                  {isDuplicate && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2 animate-pulse font-bold">
-                        <AlertOctagon size={18}/> Attention : Tu as déjà postulé ici !
-                    </div>
-                  )}
+                  {isDuplicate && (<div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2 animate-pulse font-bold"><AlertOctagon size={18}/> Attention : Déjà postulé !</div>)}
 
                   <input placeholder="Entreprise (ex: Thales)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
                   <input placeholder="Poste (ex: Data Analyst)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.role} onChange={e=>setNewApp({...newApp, role: e.target.value})} required/>
@@ -310,17 +300,17 @@ const App = () => {
                     <select className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>{statusOptions.map(s=><option key={s} value={s}>{s}</option>)}</select>
                   </div>
 
-                  {/* CHAMPS CONTACT DIRECT (Conditionnel) */}
                   {newApp.source === 'Contact direct' ? (
                      <div className="bg-blue-50 p-3 rounded-lg space-y-2 border border-blue-100">
                         <p className="text-xs font-bold text-blue-800 uppercase">Détails du Contact</p>
-                        <input placeholder="Nom Prénom du Contact" className="w-full border p-2 rounded text-sm" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
-                        <input placeholder="Email du Contact" className="w-full border p-2 rounded text-sm" value={newApp.contact_email} onChange={e=>setNewApp({...newApp, contact_email: e.target.value})} />
+                        <input placeholder="Nom Prénom" className="w-full border p-2 rounded text-sm" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                        <input placeholder="Email" className="w-full border p-2 rounded text-sm" value={newApp.contact_email} onChange={e=>setNewApp({...newApp, contact_email: e.target.value})} />
+                        <input type="date" className="w-full border p-2 rounded text-sm" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
                      </div>
                   ) : (
                      <div className="grid grid-cols-2 gap-3">
                         <input type="date" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
-                        <input placeholder="Lieu (Ville)" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                        <input placeholder="Lieu" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
                      </div>
                   )}
                   
@@ -336,7 +326,6 @@ const App = () => {
             </div>
           </div>
 
-          {/* LISTE / KANBAN */}
           <div className="lg:col-span-2 space-y-4">
              <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex bg-white rounded-lg border p-1">
@@ -347,10 +336,7 @@ const App = () => {
                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
                    <input placeholder="Rechercher..." className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
                 </div>
-                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer">
-                    <option value="date">📅 Date (Récent)</option>
-                    <option value="alpha">🔤 Alphabétique</option>
-                </select>
+                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white cursor-pointer"><option value="date">📅 Date</option><option value="alpha">🔤 Alphabétique</option></select>
              </div>
 
              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[500px]">
@@ -358,15 +344,7 @@ const App = () => {
                    <div className="overflow-x-auto">
                      <table className="w-full text-left text-sm">
                        <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b">
-                         <tr>
-                           <th className="p-4">Entreprise</th>
-                           <th className="p-4">Poste</th>
-                           <th className="p-4">Statut</th>
-                           <th className="p-4">Infos / Contact</th>
-                           <th className="p-4 text-center">Relance (J+15)</th>
-                           <th className="p-4 text-center">Fait ?</th>
-                           <th className="p-4 text-right">Action</th>
-                         </tr>
+                         <tr><th className="p-4">Entreprise</th><th className="p-4">Poste</th><th className="p-4">Statut</th><th className="p-4">Infos / Contact</th><th className="p-4 text-center">Relance (J+15)</th><th className="p-4 text-center">Fait ?</th><th className="p-4 text-right">Action</th></tr>
                        </thead>
                        <tbody className="divide-y">
                          {filteredApps.map(app => (
@@ -374,26 +352,10 @@ const App = () => {
                               <td className="p-4 font-bold text-[#0f1f41]">{app.company}</td>
                               <td className="p-4 text-gray-600">{app.role}</td>
                               <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-medium border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span></td>
-                              <td className="p-4">
-                                {app.contact_email ? (
-                                    <div className="flex flex-col text-xs">
-                                        <span className="font-bold text-gray-700">{app.location}</span>
-                                        <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline">{app.contact_email}</a>
-                                    </div>
-                                ) : <span className="text-gray-400 text-xs">{app.location || "-"}</span>}
-                              </td>
-                              <td className="p-4 text-center">
-                                <span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 line-through opacity-50' : 'bg-orange-50 text-orange-600'}`}>
-                                    {calculateRelance(app.date)}
-                                </span>
-                              </td>
-                              <td className="p-4 text-center">
-                                <input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600 rounded"/>
-                              </td>
-                              <td className="p-4 text-right">
-                                 <button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button>
-                                 <button onClick={()=>{setNewApp(app); setEditingId(app.id);}} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button>
-                              </td>
+                              <td className="p-4">{app.contact_email ? (<div className="flex flex-col text-xs"><span className="font-bold text-gray-700">{app.location}</span><a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline">{app.contact_email}</a></div>) : <span className="text-gray-400 text-xs">{app.location || "-"}</span>}</td>
+                              <td className="p-4 text-center"><span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 line-through opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span></td>
+                              <td className="p-4 text-center"><input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600 rounded"/></td>
+                              <td className="p-4 text-right"><button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button><button onClick={()=>{setNewApp(app); setEditingId(app.id);}} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button></td>
                            </tr>
                          ))}
                        </tbody>
@@ -408,15 +370,9 @@ const App = () => {
                            <div className="flex flex-col gap-2">
                              {filteredApps.filter(a=>a.status===status).map(app => (
                                <div key={app.id} className={`bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${app.relanceDone ? 'opacity-60 grayscale' : ''}`} onClick={()=>{setNewApp(app); setEditingId(app.id);}}>
-                                  <div className="flex justify-between items-start">
-                                    <div className="font-bold text-[#0f1f41]">{app.company}</div>
-                                    {app.lm_url && <FileText size={12} className="text-blue-400"/>}
-                                  </div>
+                                  <div className="flex justify-between items-start"><div className="font-bold text-[#0f1f41]">{app.company}</div>{app.lm_url && <FileText size={12} className="text-blue-400"/>}</div>
                                   <div className="text-xs text-gray-500 mb-2">{app.role}</div>
-                                  <div className="flex justify-between items-end">
-                                     <div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">J+15: {calculateRelance(app.date)}</div>
-                                     {app.relanceDone && <CheckCircle size={14} className="text-green-500"/>}
-                                  </div>
+                                  <div className="flex justify-between items-end"><div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">J+15: {calculateRelance(app.date)}</div>{app.relanceDone && <CheckCircle size={14} className="text-green-500"/>}</div>
                                </div>
                              ))}
                            </div>
@@ -429,8 +385,9 @@ const App = () => {
         </div>
       </div>
       
-      <footer className="bg-white border-t p-6 text-center text-sm text-gray-400">
-        <p>© 2026 - Développé avec <Heart size={10} className="inline text-red-400"/> par Sheryne OUARGHI-MHIRI/ sheryne.ouarghi.pro@gmail.com</p>
+      {/* FOOTER PERSO */}
+      <footer className="bg-white border-t p-6 text-center text-sm text-gray-500">
+        <p>© 2026 - Développé avec <Heart size={10} className="inline text-red-400"/> par Sheryne OUARGHI-MHIRI/ <a href="mailto:sheryne.ouarghi.pro@gmail.com" className="hover:text-blue-600 hover:underline">sheryne.ouarghi.pro@gmail.com</a></p>
       </footer>
     </div>
   );
