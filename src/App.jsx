@@ -4,15 +4,15 @@ import {
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
   Search, Pencil, X, Mail, AlertTriangle, ExternalLink, FileText, 
   Upload, FileCheck, List, LogOut, User, Lock, LayoutGrid,
-  CheckCircle, RefreshCw, AlertOctagon, Heart 
+  CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, Link as LinkIcon
 } from 'lucide-react';
+
 
 // 👇 REMETS TES CLÉS SUPABASE ICI
 const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
 
-
-// Sécurité : empêche le crash si les clés sont vides
+// Sécurité
 const safeSupabase = () => {
   if (!supabaseUrl || supabaseUrl.includes('TON_URL')) return null;
   return createClient(supabaseUrl, supabaseKey);
@@ -30,6 +30,43 @@ const JOB_BOARDS = [
   { name: 'JobTeaser', url: 'https://cytech.jobteaser.com/', color: 'text-[#00ab65] border-[#00ab65] hover:bg-[#00ab65] hover:text-white' },
   { name: 'MyJobGlasses', url: 'https://www.myjobglasses.com/', color: 'text-pink-600 border-pink-600 hover:bg-pink-600 hover:text-white' },
 ];
+
+// --- MODAL RGPD & EXPORT ---
+const LegalModal = ({ onClose, onExport, onDeleteAccount }) => (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+      <div className="flex justify-between items-center mb-6 border-b pb-4">
+        <h2 className="text-xl font-bold text-[#0f1f41] flex items-center gap-2"><ShieldCheck className="text-blue-600"/> Données & Confidentialité (RGPD)</h2>
+        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full"><X size={24}/></button>
+      </div>
+      
+      <div className="space-y-6 text-sm text-gray-700">
+        <section>
+            <h3 className="font-bold text-lg mb-2 text-gray-900">1. Vos Droits</h3>
+            <p>Conformément au RGPD, vous disposez d'un droit d'accès, de portabilité et d'effacement de vos données.</p>
+        </section>
+
+        <section className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Download size={16}/> Portabilité des données</h3>
+            <p className="mb-3">Vous pouvez télécharger l'intégralité de vos candidatures au format CSV (compatible Excel).</p>
+            <button onClick={onExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 flex items-center gap-2">Télécharger mes données (.csv)</button>
+        </section>
+
+        <section className="bg-red-50 p-4 rounded-lg border border-red-100">
+            <h3 className="font-bold text-red-900 mb-2 flex items-center gap-2"><Trash2 size={16}/> Zone de Danger : Suppression</h3>
+            <p className="mb-3">Cette action est <strong>irréversible</strong>. Elle supprimera votre compte et toutes vos candidatures.</p>
+            <button onClick={() => { if(window.confirm("ES-TU SÛR ? Tout sera effacé définitivement.")) onDeleteAccount(); }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700">Supprimer mon compte</button>
+        </section>
+
+        <section className="text-xs text-gray-500 mt-4 border-t pt-4">
+            <p><strong>Éditeur :</strong> Sheryne OUARGHI-MHIRI (Projet Étudiant)</p>
+            <p><strong>Hébergement :</strong> Vercel Inc. / Supabase (Europe/USA)</p>
+            <p><strong>Contact :</strong> sheryne.ouarghi.pro@gmail.com</p>
+        </section>
+      </div>
+    </div>
+  </div>
+);
 
 // --- COMPOSANT ROUTINE ---
 const DailyRoutine = () => {
@@ -104,12 +141,10 @@ const AuthScreen = ({ supabase }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full text-center">
-        {/* LOGO AVEC SÉCURITÉ */}
         <div className="w-24 h-24 mx-auto mb-4 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden relative">
              <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} alt="Logo" className="w-full h-full object-contain z-10 relative"/>
              <Briefcase className="text-blue-500 absolute opacity-20" size={40}/>
         </div>
-        
         <h1 className="text-2xl font-bold mb-2 text-gray-800">Suivi Alternance</h1>
         <p className="text-gray-500 text-sm mb-6">{isSignUp ? "Créer un compte" : "Connexion à ton espace"}</p>
         <form onSubmit={handleAuth} className="space-y-4">
@@ -124,12 +159,13 @@ const AuthScreen = ({ supabase }) => {
   );
 };
 
-// --- APP ---
+// --- APP PRINCIPALE ---
 const App = () => {
   const [session, setSession] = useState(null);
   const [applications, setApplications] = useState([]);
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
+  const [showLegal, setShowLegal] = useState(false);
   
   // UI States
   const [searchTerm, setSearchTerm] = useState("");
@@ -141,7 +177,7 @@ const App = () => {
   
   const [newApp, setNewApp] = useState({ 
     company: "", role: "", status: "A faire", location: "", source: "LinkedIn", 
-    contact_email: "", date: new Date().toISOString().split('T')[0], relanceDone: false, lm_url: "" 
+    contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], relanceDone: false, lm_url: "", isFavorite: false
   });
 
   const statusOptions = ["A faire", "Postulé", "Entretien", "Accepté", "Refusé"];
@@ -192,15 +228,10 @@ const App = () => {
     setUploading(false);
   };
 
-  const isDuplicate = newApp.company && applications.some(app => 
-      app.company && newApp.company && 
-      app.company.normalize("NFD").toLowerCase().trim() === newApp.company.normalize("NFD").toLowerCase().trim() && 
-      app.id !== editingId
-  );
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isDuplicate && !editingId) return alert("Doublon détecté !");
+    const isDuplicate = newApp.company && applications.some(app => app.company && newApp.company && app.company.normalize("NFD").toLowerCase().trim() === newApp.company.normalize("NFD").toLowerCase().trim() && app.id !== editingId);
+    if (isDuplicate && !editingId) return alert("Attention : Doublon détecté !");
     
     setUploading(true);
     let url = newApp.lm_url;
@@ -231,7 +262,36 @@ const App = () => {
     await supabase.from('applications').update({ relanceDone: newVal }).eq('id', app.id);
   };
 
-  const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", date: new Date().toISOString().split('T')[0], lm_url: "", relanceDone: false }); setFileLM(null); setEditingId(null); };
+  const toggleFavorite = async (app) => {
+    const newVal = !app.isFavorite;
+    setApplications(prev => prev.map(a => a.id === app.id ? { ...a, isFavorite: newVal } : a));
+    await supabase.from('applications').update({ isFavorite: newVal }).eq('id', app.id);
+  };
+
+  // --- ACTIONS RGPD ---
+  const exportToCSV = () => {
+    const headers = ["Entreprise", "Poste", "Statut", "Source", "Lien/Email", "Date", "Relance Faite"];
+    const rows = applications.map(app => [
+        `"${app.company}"`, `"${app.role}"`, `"${app.status}"`, `"${app.source}"`, 
+        `"${app.application_url || app.contact_email || ''}"`, `"${app.date}"`, `"${app.relanceDone ? 'Oui' : 'Non'}"`
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
+    const link = document.createElement("a"); link.href = encodeURI(csvContent); link.download = "mes_candidatures.csv"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  };
+
+  const deleteAccountData = async () => {
+    // Suppression des données (la ligne User Auth restera mais les données seront vides)
+    setLoading(true);
+    await supabase.from('applications').delete().neq('id', 0); // Supprime tout
+    await supabase.from('profile').delete().neq('id', 0);
+    await supabase.auth.signOut();
+    setSession(null);
+    setLoading(false);
+    setShowLegal(false);
+    alert("Compte et données supprimés.");
+  };
+
+  const resetForm = () => { setNewApp({ company: "", role: "", status: "A faire", location: "", source: "LinkedIn", contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], lm_url: "", relanceDone: false, isFavorite: false }); setFileLM(null); setEditingId(null); };
   const calculateRelance = (d) => { if (!d) return "-"; const date = new Date(d); date.setDate(date.getDate() + 15); return date.toLocaleDateString('fr-FR'); };
 
   const filteredApps = applications
@@ -264,6 +324,7 @@ const App = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="space-y-6">
+            {/* DOCS */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
                <h2 className="font-bold flex items-center gap-2 mb-4 text-[#0f1f41]"><FileCheck className="text-[#005792]"/> Mes Documents</h2>
                <div className="space-y-3">
@@ -272,7 +333,7 @@ const App = () => {
                         <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${profile?.[`cv_${type}`] ? 'border-[#00ab65] bg-green-50' : 'border-dashed border-gray-300 hover:border-[#005792] hover:bg-blue-50'}`}>
                           <div className="flex items-center gap-3">
                             <div className={`p-2 rounded-full ${profile?.[`cv_${type}`] ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>{type === 'ats' ? <FileText size={18}/> : <User size={18}/>}</div>
-                            <div><span className="text-sm font-bold text-gray-700 block">{type === 'ats' ? 'CV ATS (Robot)' : 'CV Design'}</span><span className="text-[10px] text-gray-400">{profile?.[`cv_${type}`] ? "Chargé" : "PDF"}</span></div>
+                            <div><span className="text-sm font-bold text-gray-700 block">{type === 'ats' ? 'CV ATS' : 'CV Design'}</span><span className="text-[10px] text-gray-400">{profile?.[`cv_${type}`] ? "Chargé" : "PDF"}</span></div>
                           </div>
                           <Upload size={16} className="text-gray-400"/>
                           <input type="file" className="hidden" onChange={(e) => handleProfileUpload(e.target.files[0], type)} disabled={uploading}/>
@@ -283,6 +344,7 @@ const App = () => {
                </div>
             </div>
 
+            {/* FORMULAIRE INTELLIGENT */}
             <div className={`bg-white p-5 rounded-xl shadow-sm border border-gray-200 ${editingId ? 'ring-2 ring-orange-200' : ''}`}>
                <div className="flex justify-between items-center mb-4">
                  <h2 className="font-bold text-[#0f1f41]">{editingId ? "Modifier" : "Nouvelle Candidature"}</h2>
@@ -290,8 +352,6 @@ const App = () => {
                </div>
                
                <form onSubmit={handleSubmit} className="space-y-3">
-                  {isDuplicate && (<div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2 animate-pulse font-bold"><AlertOctagon size={18}/> Attention : Déjà postulé !</div>)}
-
                   <input placeholder="Entreprise (ex: Thales)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
                   <input placeholder="Poste (ex: Data Analyst)" className="w-full border p-2 rounded-lg text-sm bg-gray-50 focus:bg-white transition-colors" value={newApp.role} onChange={e=>setNewApp({...newApp, role: e.target.value})} required/>
                   
@@ -300,17 +360,24 @@ const App = () => {
                     <select className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>{statusOptions.map(s=><option key={s} value={s}>{s}</option>)}</select>
                   </div>
 
+                  {/* LOGIQUE CONTACT VS LIEN */}
                   {newApp.source === 'Contact direct' ? (
                      <div className="bg-blue-50 p-3 rounded-lg space-y-2 border border-blue-100">
-                        <p className="text-xs font-bold text-blue-800 uppercase">Détails du Contact</p>
+                        <p className="text-xs font-bold text-blue-800 uppercase">Contact Direct</p>
                         <input placeholder="Nom Prénom" className="w-full border p-2 rounded text-sm" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
-                        <input placeholder="Email" className="w-full border p-2 rounded text-sm" value={newApp.contact_email} onChange={e=>setNewApp({...newApp, contact_email: e.target.value})} />
+                        <input placeholder="Email du contact" className="w-full border p-2 rounded text-sm" value={newApp.contact_email} onChange={e=>setNewApp({...newApp, contact_email: e.target.value})} />
                         <input type="date" className="w-full border p-2 rounded text-sm" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
                      </div>
                   ) : (
-                     <div className="grid grid-cols-2 gap-3">
-                        <input type="date" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
-                        <input placeholder="Lieu" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                     <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                           <input type="date" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
+                           <input placeholder="Lieu" className="border p-2 rounded-lg text-sm bg-gray-50" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
+                        </div>
+                        <div className="relative">
+                            <LinkIcon className="absolute left-3 top-2.5 text-gray-400" size={16}/>
+                            <input placeholder="Lien de l'annonce (URL)" className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm bg-gray-50" value={newApp.application_url} onChange={e=>setNewApp({...newApp, application_url: e.target.value})} />
+                        </div>
                      </div>
                   )}
                   
@@ -319,7 +386,7 @@ const App = () => {
                      <input type="file" className="hidden" onChange={(e) => setFileLM(e.target.files[0])} />
                   </label>
                   
-                  <button disabled={uploading || (isDuplicate && !editingId)} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : (isDuplicate ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#005792] hover:bg-[#004270]')}`}>
+                  <button disabled={uploading} className={`w-full py-2.5 rounded-lg text-white font-bold text-sm shadow-md transition-transform active:scale-95 ${editingId ? 'bg-orange-500' : 'bg-[#005792] hover:bg-[#004270]'}`}>
                     {uploading ? "..." : (editingId ? "Sauvegarder" : "Ajouter la candidature")}
                   </button>
                </form>
@@ -344,15 +411,22 @@ const App = () => {
                    <div className="overflow-x-auto">
                      <table className="w-full text-left text-sm">
                        <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b">
-                         <tr><th className="p-4">Entreprise</th><th className="p-4">Poste</th><th className="p-4">Statut</th><th className="p-4">Infos / Contact</th><th className="p-4 text-center">Relance (J+15)</th><th className="p-4 text-center">Fait ?</th><th className="p-4 text-right">Action</th></tr>
+                         <tr><th className="p-4 w-10"></th><th className="p-4">Entreprise</th><th className="p-4">Poste</th><th className="p-4">Statut</th><th className="p-4">Infos / Lien</th><th className="p-4 text-center">Relance (J+15)</th><th className="p-4 text-center">Fait ?</th><th className="p-4 text-right">Action</th></tr>
                        </thead>
                        <tbody className="divide-y">
                          {filteredApps.map(app => (
                            <tr key={app.id} className="hover:bg-gray-50 group">
+                              <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={18} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
                               <td className="p-4 font-bold text-[#0f1f41]">{app.company}</td>
                               <td className="p-4 text-gray-600">{app.role}</td>
                               <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-medium border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span></td>
-                              <td className="p-4">{app.contact_email ? (<div className="flex flex-col text-xs"><span className="font-bold text-gray-700">{app.location}</span><a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline">{app.contact_email}</a></div>) : <span className="text-gray-400 text-xs">{app.location || "-"}</span>}</td>
+                              <td className="p-4">
+                                {app.source === 'Contact direct' ? (
+                                    <div className="flex flex-col text-xs"><span className="font-bold text-gray-700">{app.location}</span><a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1"><Mail size={10}/> {app.contact_email || "-"}</a></div>
+                                ) : (
+                                    app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-xs font-bold"><ExternalLink size={10}/> Voir l'annonce</a> : <span className="text-gray-400 text-xs">-</span>
+                                )}
+                              </td>
                               <td className="p-4 text-center"><span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 line-through opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span></td>
                               <td className="p-4 text-center"><input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600 rounded"/></td>
                               <td className="p-4 text-right"><button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button><button onClick={()=>{setNewApp(app); setEditingId(app.id);}} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button></td>
@@ -370,7 +444,10 @@ const App = () => {
                            <div className="flex flex-col gap-2">
                              {filteredApps.filter(a=>a.status===status).map(app => (
                                <div key={app.id} className={`bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer ${app.relanceDone ? 'opacity-60 grayscale' : ''}`} onClick={()=>{setNewApp(app); setEditingId(app.id);}}>
-                                  <div className="flex justify-between items-start"><div className="font-bold text-[#0f1f41]">{app.company}</div>{app.lm_url && <FileText size={12} className="text-blue-400"/>}</div>
+                                  <div className="flex justify-between items-start">
+                                      <div className="font-bold text-[#0f1f41]">{app.company}</div>
+                                      <button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={14} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button>
+                                  </div>
                                   <div className="text-xs text-gray-500 mb-2">{app.role}</div>
                                   <div className="flex justify-between items-end"><div className="text-[10px] text-gray-400 bg-gray-50 inline-block px-1.5 py-0.5 rounded">J+15: {calculateRelance(app.date)}</div>{app.relanceDone && <CheckCircle size={14} className="text-green-500"/>}</div>
                                </div>
@@ -386,9 +463,12 @@ const App = () => {
       </div>
       
       {/* FOOTER PERSO */}
-      <footer className="bg-white border-t p-6 text-center text-sm text-gray-500">
-        <p>© 2026 - Développé avec <Heart size={10} className="inline text-red-400"/> par Sheryne OUARGHI-MHIRI/ <a href="mailto:sheryne.ouarghi.pro@gmail.com" className="hover:text-blue-600 hover:underline">sheryne.ouarghi.pro@gmail.com</a></p>
+      <footer className="bg-white border-t p-6 text-center text-sm text-gray-500 flex flex-col items-center gap-2">
+        <p>© 2026 - Développé avec <Heart size={10} className="inline text-red-400"/> par Sheryne OUARGHI-MHIRI / <a href="mailto:sheryne.ouarghi.pro@gmail.com" className="hover:text-blue-600 hover:underline">sheryne.ouarghi.pro@gmail.com</a></p>
+        <button onClick={() => setShowLegal(true)} className="text-xs text-gray-400 hover:text-gray-600 underline">Mentions Légales & RGPD</button>
       </footer>
+
+      {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={exportToCSV} onDeleteAccount={deleteAccountData} />}
     </div>
   );
 };
