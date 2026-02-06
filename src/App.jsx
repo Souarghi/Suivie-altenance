@@ -377,9 +377,9 @@ const App = () => {
       {/* FOOTER */}
       <footer className="bg-white border-t border-gray-200 p-6 text-center text-sm text-gray-500 mt-auto">
         <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-            <p>© {new Date().getFullYear()} - Développé par <strong>TON NOM ET PRÉNOM</strong> - Tous droits réservés.</p>
+            <p>© {new Date().getFullYear()} - Développé par <strong>Sheryne OUARGHI-MHIRI</strong> - Tous droits réservés.</p>
             <span className="hidden md:block">•</span>
-            <p className="flex items-center gap-2">Contact : <a href="mailto:TON.EMAIL@PRO.COM" className="text-blue-600 hover:underline font-medium">TON.EMAIL@PRO.COM</a></p>
+            <p className="flex items-center gap-2">Contact : <a href="mailto:TON.EMAIL@PRO.COM" className="text-blue-600 hover:underline font-medium">sheryne.ouarghi.pro@gmail.com</a></p>
         </div>
         <div className="mt-2 text-xs text-gray-400 flex items-center justify-center gap-1">Fait avec <Heart size={10} className="text-red-400 fill-current"/> pour l'alternance</div>
       </footer>
