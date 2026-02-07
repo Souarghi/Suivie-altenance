@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { 
@@ -8,6 +9,7 @@ import {
 } from 'lucide-react';
 
 // IMPORT DES VUES SÉPARÉES
+// Assure-toi que les fichiers sont bien dans le dossier "components" !
 import DesktopView from './components/DesktopView';
 import MobileView from './components/MobileView';
 
@@ -16,7 +18,6 @@ const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
 
 // --- CONFIGURATION ---
-
 const safeSupabase = () => {
   if (!supabaseUrl || supabaseUrl.includes('TON_URL')) return null;
   return createClient(supabaseUrl, supabaseKey);
@@ -301,7 +302,6 @@ const App = () => {
                  
                  {/* 1. TABLEAU (VISIBLE UNIQUEMENT SUR ORDI) */}
                  <div className="hidden md:block overflow-x-auto">
-                    {/* 👇 J'appelle ton composant DesktopView ici */}
                     <DesktopView 
                         applications={filteredApps} 
                         toggleFavorite={toggleFavorite} 
@@ -314,7 +314,6 @@ const App = () => {
 
                  {/* 2. CARTES (VISIBLE UNIQUEMENT SUR MOBILE) */}
                  <div className="md:hidden">
-                    {/* 👇 J'appelle ton composant MobileView ici */}
                     <MobileView 
                         applications={filteredApps} 
                         toggleFavorite={toggleFavorite} 
@@ -334,68 +333,6 @@ const App = () => {
       <footer className="bg-white border-t p-6 text-center text-sm text-gray-500 mt-auto">
         <p>© 2026 - Développé avec <Heart size={10} className="inline text-red-400"/> par Sheryne OUARGHI-MHIRI</p>
       </footer>
-    </div>
-  );
-};
-
-// -------------------------------------------------------------------------
-// 👇 SOUS-COMPOSANTS INTEGRÉS (POUR EVITER LES ERREURS DE FICHIERS)
-// -------------------------------------------------------------------------
-
-const DesktopView = ({ applications, toggleFavorite, calculateRelance, toggleRelance, handleDelete, handleEdit }) => {
-  return (
-    <table className="w-full text-left text-sm">
-        <thead className="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b">
-            <tr><th className="p-4 w-10"></th><th className="p-4">Entreprise</th><th className="p-4">Poste</th><th className="p-4">Statut</th><th className="p-4">Infos</th><th className="p-4 text-center">Relance</th><th className="p-4 text-center">Fait</th><th className="p-4 text-right">Action</th></tr>
-        </thead>
-        <tbody className="divide-y">
-            {applications.map(app => (
-            <tr key={app.id} className="hover:bg-gray-50 group">
-                <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={18} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
-                <td className="p-4 font-bold text-[#0f1f41]">{app.company}</td>
-                <td className="p-4 text-gray-600">{app.role}</td>
-                <td className="p-4"><span className={`px-2 py-1 rounded-full text-xs font-medium border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span></td>
-                <td className="p-4 text-xs">{app.location && <div className="font-bold">{app.location}</div>}{app.contact_email && <div className="text-blue-500">{app.contact_email}</div>}{app.application_url && <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">Lien</a>}</td>
-                <td className="p-4 text-center"><span className={`text-xs font-bold px-2 py-1 rounded ${app.relanceDone ? 'bg-green-100 text-green-700' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span></td>
-                <td className="p-4 text-center"><input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer"/></td>
-                <td className="p-4 text-right"><button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={16}/></button><button onClick={()=>handleEdit(app)} className="text-gray-300 hover:text-blue-500 p-1"><Pencil size={16}/></button></td>
-            </tr>
-            ))}
-        </tbody>
-    </table>
-  );
-};
-
-const MobileView = ({ applications, toggleFavorite, calculateRelance, toggleRelance, handleDelete, handleEdit }) => {
-  return (
-    <div className="space-y-3">
-        {applications.map(app => (
-            <div key={app.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative">
-                <div className="flex justify-between items-start mb-2">
-                    <div><h3 className="font-bold text-[#0f1f41] text-lg">{app.company}</h3><p className="text-gray-600 text-sm">{app.role}</p></div>
-                    <button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button>
-                </div>
-                <div className="flex flex-wrap gap-2 mb-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${app.status==='Postulé'?'bg-blue-50 border-blue-200 text-blue-700':app.status==='Refusé'?'bg-red-50 border-red-200 text-red-700':app.status==='Accepté'?'bg-green-50 border-green-200 text-green-700':'bg-gray-50 border-gray-200'}`}>{app.status}</span>
-                    <span className="text-xs text-gray-500 border px-2 py-0.5 rounded-full">{app.source}</span>
-                </div>
-                <div className="flex flex-col gap-1 text-xs text-gray-500 mb-3 bg-gray-50 p-2 rounded-lg">
-                    {app.location && <span className="flex items-center gap-1"><MapPin size={12}/> {app.location}</span>}
-                    {app.contact_email && <a href={`mailto:${app.contact_email}`} className="text-blue-600 flex items-center gap-1"><Mail size={12}/> {app.contact_email}</a>}
-                    {app.application_url && <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 flex items-center gap-1"><ExternalLink size={12}/> Voir l'annonce</a>}
-                </div>
-                <div className="flex justify-between items-center border-t pt-3 mt-2">
-                    <div className="flex items-center gap-2">
-                        <input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 rounded"/>
-                        <span className={`text-xs font-bold ${app.relanceDone ? 'text-green-600' : 'text-orange-600'}`}>J+15: {calculateRelance(app.date)}</span>
-                    </div>
-                    <div className="flex gap-3">
-                        <button onClick={()=>handleEdit(app)} className="text-blue-500 bg-blue-50 p-2 rounded-lg"><Pencil size={18}/></button>
-                        <button onClick={()=>handleDelete(app.id)} className="text-red-400 bg-red-50 p-2 rounded-lg"><Trash2 size={18}/></button>
-                    </div>
-                </div>
-            </div>
-        ))}
     </div>
   );
 };
