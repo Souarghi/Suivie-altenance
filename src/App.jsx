@@ -7,7 +7,7 @@ import {
   CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, Link as LinkIcon, Star, Check
 } from 'lucide-react';
 
-// Configuration Supabase
+// --- CONFIGURATION SUPABASE ---
 const supabaseUrl = 'https://mvloohmnvggirpdfhotb.supabase.co';
 const supabaseKey = 'sb_publishable_fAGf692lpXVGI1YZgyx3Ew_Dz_tEEYO';
 
@@ -17,6 +17,7 @@ const safeSupabase = () => {
 };
 const supabase = safeSupabase();
 
+// --- DONNÉES GLOBALES ---
 const JOB_BOARDS = [
   { name: 'LinkedIn', url: 'https://www.linkedin.com/jobs/', color: 'text-[#0077b5] border-[#0077b5] hover:bg-[#0077b5] hover:text-white' },
   { name: 'HelloWork', url: 'https://www.hellowork.com/', color: 'text-[#ff0000] border-[#ff0000] hover:bg-[#ff0000] hover:text-white' },
@@ -28,6 +29,45 @@ const JOB_BOARDS = [
   { name: 'MyJobGlasses', url: 'https://www.myjobglasses.com/', color: 'text-pink-600 border-pink-600 hover:bg-pink-600 hover:text-white' },
 ];
 
+const STATUS_OPTIONS = ["A faire", "Postulé", "Entretien", "Accepté", "Refusé"];
+const SOURCE_OPTIONS = ["LinkedIn", "Indeed", "HelloWork", "WTTJ", "JobTeaser", "Contact direct", "Site Entreprise", "Autre"];
+
+// --- COMPOSANT : ROUTINE DU MATIN ---
+const DailyRoutine = () => {
+  const [checks, setChecks] = useState({});
+  const today = new Date().toLocaleDateString('fr-FR');
+  
+  useEffect(() => { 
+      const saved = JSON.parse(localStorage.getItem('dailyRoutine') || '{}'); 
+      if (saved.date === today) setChecks(saved.checks || {});
+  }, [today]);
+
+  const toggleCheck = (siteName) => { 
+      const newChecks = { ...checks, [siteName]: !checks[siteName] }; 
+      setChecks(newChecks); 
+      localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: newChecks })); 
+  };
+
+  const progress = Math.round((Object.values(checks).filter(Boolean).length / JOB_BOARDS.length) * 100);
+
+  return (
+    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="font-bold flex items-center gap-2 text-gray-800"><RefreshCw size={18} className="text-blue-600"/> Routine du Matin</h3>
+        <div className="text-xs font-bold text-gray-500">{progress}%</div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {JOB_BOARDS.map(site => (
+          <button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 text-gray-400 opacity-50' : site.color}`}>
+            {site.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- COMPOSANT : MODAL RGPD ---
 const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
     <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
@@ -64,6 +104,7 @@ const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
   </div>
 );
 
+// --- COMPOSANT : ECRAN D'AUTHENTIFICATION ---
 const AuthScreen = ({ supabase }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -115,6 +156,7 @@ const AuthScreen = ({ supabase }) => {
   );
 };
 
+// --- COMPOSANT PRINCIPAL : APP ---
 const App = () => {
   const [session, setSession] = useState(null);
   const [applications, setApplications] = useState([]);
@@ -134,9 +176,6 @@ const App = () => {
     company: "", role: "", status: "A faire", location: "", source: "LinkedIn", 
     contact_email: "", application_url: "", date: new Date().toISOString().split('T')[0], relanceDone: false, isFavorite: false
   });
-
-  const statusOptions = ["A faire", "Postulé", "Entretien", "Accepté", "Refusé"];
-  const sourceOptions = ["LinkedIn", "Indeed", "HelloWork", "WTTJ", "JobTeaser", "Contact direct", "Site Entreprise", "Autre"];
 
   useEffect(() => {
     if (!supabase) return;
@@ -158,20 +197,6 @@ const App = () => {
       if (prof) setProfile(prof);
     } catch (e) { console.error(e); } 
     finally { setLoading(false); }
-  };
-
-  const handleProfileUpload = async (file, type) => {
-    if (!file) return;
-    setUploading(true);
-    const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
-    const { error: upErr } = await supabase.storage.from('documents').upload(fileName, file);
-    if (!upErr) {
-      const { data } = supabase.storage.from('documents').getPublicUrl(fileName);
-      const updateData = type === 'ats' ? { cv_ats: data.publicUrl } : { cv_human: data.publicUrl };
-      await supabase.from('profile').update(updateData).gt('id', 0);
-      setProfile(prev => ({ ...prev, ...updateData }));
-    }
-    setUploading(false);
   };
 
   const handleSubmit = async (e) => {
@@ -228,38 +253,19 @@ const App = () => {
   const filteredApps = applications
     .filter(a => a.company?.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => {
-        if (sortType === 'source') return a.source.localeCompare(b.source); // Ajout tri par source
+        if (sortType === 'source') return (a.source || "").localeCompare(b.source || ""); 
         if (sortType === 'favorite') return (b.isFavorite === true) - (a.isFavorite === true);
         if (sortType === 'alpha') return a.company.localeCompare(b.company);
         if (sortType === 'date_asc') return new Date(a.date) - new Date(b.date);
         return new Date(b.date) - new Date(a.date);
     });
 
-  const DailyRoutine = () => {
-    const [checks, setChecks] = useState({});
-    const today = new Date().toLocaleDateString('fr-FR');
-    useEffect(() => { 
-        const saved = JSON.parse(localStorage.getItem('dailyRoutine') || '{}'); 
-        if (saved.date === today) setChecks(saved.checks || {});
-    }, [today]);
-    const toggleCheck = (siteName) => { 
-        const newChecks = { ...checks, [siteName]: !checks[siteName] }; 
-        setChecks(newChecks); 
-        localStorage.setItem('dailyRoutine', JSON.stringify({ date: today, checks: newChecks })); 
-    };
-    const progress = Math.round((Object.values(checks).filter(Boolean).length / JOB_BOARDS.length) * 100);
-    return (
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
-        <div className="flex justify-between items-center mb-3"><h3 className="font-bold flex items-center gap-2 text-gray-800"><RefreshCw size={18} className="text-blue-600"/> Routine du Matin</h3><div className="text-xs font-bold text-gray-500">{progress}%</div></div>
-        <div className="flex flex-wrap gap-2">{JOB_BOARDS.map(site => (<button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 text-gray-400 opacity-50' : site.color}`}>{site.name}</button>))}</div>
-      </div>
-    );
-  };
-
   if (!session) return <AuthScreen supabase={supabase} />;
 
+  // --- RENDU PRINCIPAL DE L'APPLICATION ---
   return (
     <div className="min-h-screen bg-[#f8f9fa] text-slate-800 font-sans flex flex-col">
+      {/* 1. WRAPPER PRINCIPAL POUR LE CONTENU (HEADER, FORM, TABLEAU) */}
       <div className="max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6 flex-1">
         
         {/* HEADER */}
@@ -268,9 +274,10 @@ const App = () => {
           <button onClick={() => {supabase.auth.signOut(); setSession(null);}} className="text-red-500 p-2 hover:bg-red-50 rounded-lg"><LogOut size={20}/></button>
         </div>
 
+        {/* ROUTINE */}
         <DailyRoutine />
 
-        {/* 1. FORMULAIRE EN HAUT (PLEINE LARGEUR) */}
+        {/* FORMULAIRE EN HAUT */}
         <div ref={formRef} className={`bg-white p-6 rounded-xl shadow-sm border-2 transition-all ${editingId ? 'border-orange-400 bg-orange-50/30' : 'border-transparent'}`}>
             <div className="flex justify-between items-center mb-6">
                 <h2 className="font-extrabold text-[#0f1f41] flex items-center gap-2 text-lg">
@@ -292,13 +299,13 @@ const App = () => {
                 <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Plateforme / Source</label>
                     <select className="w-full border p-2.5 rounded-lg text-sm bg-gray-50 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none" value={newApp.source} onChange={e=>setNewApp({...newApp, source: e.target.value})}>
-                        {sourceOptions.map(s=><option key={s} value={s}>{s}</option>)}
+                        {SOURCE_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}
                     </select>
                 </div>
                 <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Statut actuel</label>
                     <select className="w-full border p-2.5 rounded-lg text-sm bg-gray-50 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>
-                        {statusOptions.map(s=><option key={s} value={s}>{s}</option>)}
+                        {STATUS_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}
                     </select>
                 </div>
 
@@ -324,7 +331,7 @@ const App = () => {
             </form>
         </div>
 
-        {/* 2. TABLEAU ET FILTRES */}
+        {/* TABLEAU ET FILTRES */}
         <div className="space-y-4">
              <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex bg-white rounded-lg border p-1 shadow-sm">
@@ -338,7 +345,7 @@ const App = () => {
                 <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-3 py-2 text-sm bg-white shadow-sm cursor-pointer outline-none">
                     <option value="date_desc">📅 Plus récent</option>
                     <option value="date_asc">📅 Plus ancien</option>
-                    <option value="source">🌐 Par Plateforme</option> {/* Nouveau tri */}
+                    <option value="source">🌐 Par Plateforme</option>
                     <option value="favorite">❤️ Favoris</option>
                     <option value="alpha">🔤 Alphabétique</option>
                 </select>
@@ -353,8 +360,8 @@ const App = () => {
                             <th className="p-4 w-10"></th>
                             <th className="p-4">Entreprise</th>
                             <th className="p-4">Poste</th>
-                            <th className="p-4">Date</th> {/* Nouvelle colonne */}
-                            <th className="p-4">Source</th> {/* Nouvelle colonne */}
+                            <th className="p-4">Date</th>
+                            <th className="p-4">Source</th>
                             <th className="p-4">Statut</th>
                             <th className="p-4 text-center">Relance</th>
                             <th className="p-4 text-right">Action</th>
@@ -369,9 +376,9 @@ const App = () => {
                                 <div className="text-[10px] text-gray-400 flex items-center gap-1"><MapPin size={8}/>{app.location || "N/A"}</div>
                               </td>
                               <td className="p-4 text-gray-600 font-medium">{app.role}</td>
-                              <td className="p-4 text-gray-500 text-xs">{new Date(app.date).toLocaleDateString('fr-FR')}</td> {/* Affichage date */}
+                              <td className="p-4 text-gray-500 text-xs">{new Date(app.date).toLocaleDateString('fr-FR')}</td>
                               <td className="p-4">
-                                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold border border-gray-200">{app.source}</span> {/* Affichage source */}
+                                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold border border-gray-200">{app.source}</span>
                               </td>
                               <td className="p-4">
                                 <span className={`px-2 py-1 rounded-full text-[10px] font-bold border ${
@@ -398,7 +405,7 @@ const App = () => {
                    </div>
                 ) : (
                    <div className="flex gap-4 p-4 overflow-x-auto h-full items-start bg-gray-50/50">
-                      {statusOptions.map(status => (
+                      {STATUS_OPTIONS.map(status => (
                         <div key={status} className="min-w-[280px] bg-white rounded-xl p-3 border border-gray-200 shadow-sm">
                            <h3 className="font-bold text-xs uppercase text-gray-400 mb-4 flex justify-between px-1">{status} <span className="bg-gray-100 px-1.5 rounded text-gray-500">{filteredApps.filter(a=>a.status===status).length}</span></h3>
                            <div className="flex flex-col gap-3">
@@ -422,14 +429,16 @@ const App = () => {
                 )}
              </div>
           </div>
-        </div>
-      </div>
+
+      </div> {/* FIN DU WRAPPER MAX-W-7XL */}
       
+      {/* 2. FOOTER (HORS DU WRAPPER, MAIS DANS LE CONTAINER PRINCIPAL) */}
       <footer className="bg-white border-t p-6 text-center text-xs text-gray-400 flex flex-col items-center gap-2">
         <p>© 2026 - Développé par Sheryne OUARGHI-MHIRI</p>
         <button onClick={() => setShowLegal(true)} className="hover:underline">Mentions Légales & RGPD</button>
       </footer>
 
+      {/* 3. MODAL (HORS DU FLUX PRINCIPAL) */}
       {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={() => {}} onDeleteAccount={() => {}} />}
     </div>
   );
