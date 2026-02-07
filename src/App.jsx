@@ -58,8 +58,13 @@ const DailyRoutine = () => {
       </div>
       <div className="flex flex-wrap gap-2">
         {JOB_BOARDS.map(site => (
-          <button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 text-gray-400 opacity-50' : site.color}`}>
+          <button key={site.name} onClick={() => toggleCheck(site.name)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${checks[site.name] ? 'bg-gray-100 border-gray-300 text-gray-400 grayscale' : `bg-white ${site.color}`}`}>
+            {checks[site.name] ? <CheckCircle size={14}/> : <div className="w-3.5 h-3.5 rounded-full border border-current"></div>}
             {site.name}
+            {/* Lien rétabli ici */}
+            <a href={site.url} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="ml-1 opacity-70 hover:opacity-100 hover:scale-110 transition-transform">
+                <ExternalLink size={10}/>
+            </a>
           </button>
         ))}
       </div>
@@ -262,10 +267,8 @@ const App = () => {
 
   if (!session) return <AuthScreen supabase={supabase} />;
 
-  // --- RENDU PRINCIPAL DE L'APPLICATION ---
   return (
     <div className="min-h-screen bg-[#f8f9fa] text-slate-800 font-sans flex flex-col">
-      {/* 1. WRAPPER PRINCIPAL POUR LE CONTENU (HEADER, FORM, TABLEAU) */}
       <div className="max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6 flex-1">
         
         {/* HEADER */}
@@ -362,6 +365,7 @@ const App = () => {
                             <th className="p-4">Poste</th>
                             <th className="p-4">Date</th>
                             <th className="p-4">Source</th>
+                            <th className="p-4">Lien / Contact</th> {/* Nouvelle colonne rétablie */}
                             <th className="p-4">Statut</th>
                             <th className="p-4 text-center">Relance</th>
                             <th className="p-4 text-right">Action</th>
@@ -380,6 +384,16 @@ const App = () => {
                               <td className="p-4">
                                 <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold border border-gray-200">{app.source}</span>
                               </td>
+                              
+                              {/* Colonne LIEN rétablie ici */}
+                              <td className="p-4">
+                                {app.source === 'Contact direct' ? (
+                                    app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1 text-[10px]"><Mail size={12}/> {app.contact_email}</a> : <span className="text-gray-300 text-xs">-</span>
+                                ) : (
+                                    app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1 w-fit hover:bg-blue-100 text-[10px] font-bold border border-blue-100 transition-colors"><ExternalLink size={12}/> Voir l'annonce</a> : <span className="text-gray-300 text-xs">-</span>
+                                )}
+                              </td>
+
                               <td className="p-4">
                                 <span className={`px-2 py-1 rounded-full text-[10px] font-bold border ${
                                     app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : 
@@ -430,15 +444,15 @@ const App = () => {
              </div>
           </div>
 
-      </div> {/* FIN DU WRAPPER MAX-W-7XL */}
+      </div> 
       
-      {/* 2. FOOTER (HORS DU WRAPPER, MAIS DANS LE CONTAINER PRINCIPAL) */}
+      {/* FOOTER */}
       <footer className="bg-white border-t p-6 text-center text-xs text-gray-400 flex flex-col items-center gap-2">
         <p>© 2026 - Développé par Sheryne OUARGHI-MHIRI</p>
         <button onClick={() => setShowLegal(true)} className="hover:underline">Mentions Légales & RGPD</button>
       </footer>
 
-      {/* 3. MODAL (HORS DU FLUX PRINCIPAL) */}
+      {/* MODAL */}
       {showLegal && <LegalModal onClose={() => setShowLegal(false)} onExport={() => {}} onDeleteAccount={() => {}} />}
     </div>
   );
