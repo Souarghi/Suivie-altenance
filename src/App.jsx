@@ -4,7 +4,8 @@ import {
   Plus, Trash2, Briefcase, Building2, MapPin, Calendar, CheckSquare, 
   Search, Pencil, X, Mail, AlertTriangle, ExternalLink, FileText, 
   Upload, FileCheck, List, LogOut, User, Lock, LayoutGrid,
-  CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, Link as LinkIcon, Star, Check, File
+  CheckCircle, RefreshCw, AlertOctagon, Heart, ShieldCheck, Download, 
+  Link as LinkIcon, Star, Check, File, BookOpen, Smartphone, Share, Menu, Monitor
 } from 'lucide-react';
 
 // --- CONFIGURATION SUPABASE ---
@@ -80,6 +81,168 @@ const DailyRoutine = () => {
   );
 };
 
+// --- COMPOSANT : VUE CONSEILS ---
+const AdviceView = () => (
+    <div className="space-y-6 animate-fadeIn">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-bold text-[#0f1f41] mb-6 flex items-center gap-2"><MapPin className="text-blue-600"/> Où S'inscrire (Les Liens)</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h3 className="font-bold text-blue-900 mb-2">AFI24 (Indispensable)</h3>
+                    <p className="text-sm text-gray-600 mb-3">Pour postuler et valider l'administratif école.</p>
+                    <a href="https://www.afi24.org/" target="_blank" rel="noreferrer" className="text-blue-600 font-bold hover:underline flex items-center gap-1"><ExternalLink size={14}/> Inscription AFI24 - CY U</a>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                    <h3 className="font-bold text-purple-900 mb-2">Teams DRE</h3>
+                    <p className="text-sm text-gray-600">Rejoignez l'équipe via le QR code (affiché en cours). Activez les notifications du canal général (les offres tombent là !).</p>
+                </div>
+                <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                    <h3 className="font-bold text-green-900 mb-2">JobTeaser École</h3>
+                    <a href="https://cytech.jobteaser.com/" target="_blank" rel="noreferrer" className="text-green-700 font-bold hover:underline flex items-center gap-1"><ExternalLink size={14}/> Dashboard Jobteaser CY Tech</a>
+                </div>
+                <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                    <h3 className="font-bold text-orange-900 mb-2">Datalumni (Réseau)</h3>
+                    <p className="text-sm text-gray-600 mb-2">Pour contacter les anciens élèves (mentors, conseils).</p>
+                    <a href="#" className="text-orange-700 font-bold hover:underline flex items-center gap-1"><ExternalLink size={14}/> CY Tech Datalumni</a>
+                </div>
+            </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-bold text-[#0f1f41] mb-6 flex items-center gap-2"><FileText className="text-orange-500"/> Le CV : Les Règles d'Or</h2>
+            <div className="space-y-4">
+                <div className="border-l-4 border-orange-400 pl-4">
+                    <h3 className="font-bold text-lg">CV "ATS Friendly"</h3>
+                    <p className="text-gray-600 text-sm">Pour les candidatures en ligne sur les grands sites. Faites un CV Word, propre, sans images/colonnes complexes, pour qu'il soit lu par les robots.</p>
+                </div>
+                <div className="border-l-4 border-blue-400 pl-4">
+                    <h3 className="font-bold text-lg">CV "Humain"</h3>
+                    <p className="text-gray-600 text-sm">Pour les envois par mail ou remises en main propre. Mettez le logo de l'école + logo AFI24.</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-bold mb-2">Contenu indispensable :</h4>
+                    <ul className="list-disc pl-5 text-sm space-y-1 text-gray-700">
+                        <li><strong>Liens :</strong> LinkedIn et GitHub cliquables.</li>
+                        <li><strong>Compétences :</strong> Adaptez-les à l'offre ! Utilisez le vocabulaire exact. Outil : <a href="https://candidat.francetravail.fr/metierscope/" target="_blank" className="text-blue-600 hover:underline">Métierscope</a>.</li>
+                        <li><strong>Photo :</strong> Pro. Pas d'adresse exacte (juste la ville), pas de situation familiale. Mentionnez le Permis B.</li>
+                        <li><strong>Projets :</strong> Pas juste le titre. Précisez : Durée / Taille équipe / Réalisations (Contexte, Action, Résultat).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-bold text-[#0f1f41] mb-6 flex items-center gap-2"><User className="text-purple-600"/> L'Entretien & Le Pitch</h2>
+            
+            <div className="mb-6">
+                <h3 className="font-bold text-lg mb-3 bg-purple-100 inline-block px-2 rounded text-purple-800">Le Pitch de 3 minutes (Structure idéale)</h3>
+                <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-700">
+                    <li><strong>Ma présentation :</strong> Nom, niveau d'étude, situation actuelle.</li>
+                    <li><strong>Mon parcours formation :</strong> Pourquoi cette école ? Compétences majeures.</li>
+                    <li><strong>Mon parcours pro :</strong> 2-3 expériences majeures structurées.</li>
+                    <li><strong>Projet pro :</strong> Ce que vous voulez faire diplôme en main.</li>
+                    <li><strong>Pourquoi vous ?</strong> Lien entre l'entreprise et vos motivations.</li>
+                    <li><strong>Conclusion :</strong> Rendre la parole (Interdiction de dire "Voilà" à la fin !).</li>
+                </ol>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                     <h3 className="font-bold text-lg mb-2">La Méthode STAR</h3>
+                     <p className="text-sm text-gray-600 mb-2">Pour raconter une expérience :</p>
+                     <div className="flex items-center gap-2 text-sm font-bold bg-gray-50 p-2 rounded border">
+                        <span className="text-blue-600">Contexte</span> ➡️ <span className="text-blue-600">Action (JE)</span> ➡️ <span className="text-green-600">Résultat</span>
+                     </div>
+                </div>
+                <div>
+                     <h3 className="font-bold text-lg mb-2">Après l'entretien</h3>
+                     <ul className="list-disc pl-5 text-sm space-y-1 text-gray-700">
+                        <li>Mail de remerciement (J+1 ou J+2).</li>
+                        <li>Rappelez votre motivation et un point clé.</li>
+                        <li>Pas de réponse ? <strong>Relancez !</strong></li>
+                     </ul>
+                </div>
+            </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-bold text-[#0f1f41] mb-4 flex items-center gap-2"><Share className="text-green-600"/> Autres Ressources</h2>
+            <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500"/> <strong>LinkedIn :</strong> Créez un profil complet.</li>
+                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500"/> <strong>Plateformes :</strong> Welcome to the Jungle, Indeed, MyJobGlasses, Wilbi.</li>
+                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500"/> <strong>Cooptation :</strong> Contactez les alternants actuels via LinkedIn ou Datalumni.</li>
+            </ul>
+        </div>
+    </div>
+);
+
+// --- COMPOSANT : VUE TUTOS (INSTALLATION) ---
+const TutosView = () => (
+    <div className="max-w-3xl mx-auto space-y-8 animate-fadeIn">
+        <div className="text-center mb-8">
+            <h2 className="text-3xl font-extrabold text-[#0f1f41] mb-2">Installer l'Application</h2>
+            <p className="text-gray-600">Installez Suivi Alternance sur votre téléphone pour y accéder comme une vraie application (icône sur l'écran d'accueil).</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* ANDROID */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
+                    <Smartphone size={32}/>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Sur Android (Chrome)</h3>
+                <ol className="text-left text-sm space-y-4 w-full px-4 text-gray-600">
+                    <li className="flex gap-3">
+                        <span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                        <span>Ouvrez ce site dans <strong>Google Chrome</strong>.</span>
+                    </li>
+                    <li className="flex gap-3">
+                        <span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                        <span>Appuyez sur les <strong>trois petits points (⋮)</strong> en haut à droite.</span>
+                    </li>
+                    <li className="flex gap-3">
+                        <span className="bg-green-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                        <span>Sélectionnez <strong>"Ajouter à l'écran d'accueil"</strong> ou "Installer l'application".</span>
+                    </li>
+                </ol>
+                <div className="mt-6 p-3 bg-green-50 text-green-800 text-xs rounded-lg font-medium">
+                    L'icône "Suivi Alternance" apparaîtra sur votre téléphone !
+                </div>
+            </div>
+
+            {/* iOS */}
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                    <Smartphone size={32}/>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Sur iPhone (Safari)</h3>
+                <ol className="text-left text-sm space-y-4 w-full px-4 text-gray-600">
+                    <li className="flex gap-3">
+                        <span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                        <span>Ouvrez ce site dans <strong>Safari</strong> (obligatoire).</span>
+                    </li>
+                    <li className="flex gap-3">
+                        <span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                        <span>Appuyez sur le bouton <strong>Partager</strong> <Share size={12} className="inline"/> (carré avec flèche vers le haut).</span>
+                    </li>
+                    <li className="flex gap-3">
+                        <span className="bg-blue-600 text-white w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                        <span>Faites défiler vers le bas et appuyez sur <strong>"Sur l'écran d'accueil"</strong>.</span>
+                    </li>
+                </ol>
+                <div className="mt-6 p-3 bg-blue-50 text-blue-800 text-xs rounded-lg font-medium">
+                    L'icône sera ajoutée à côté de vos autres applications.
+                </div>
+            </div>
+        </div>
+        
+        <div className="bg-gray-50 p-4 rounded-xl text-center border border-gray-200">
+            <h4 className="font-bold text-gray-700 flex items-center justify-center gap-2 mb-2"><Monitor size={18}/> Sur Ordinateur</h4>
+            <p className="text-sm text-gray-600">Vous pouvez aussi installer le site sur PC/Mac via Chrome en cliquant sur l'icône <Download size={12} className="inline"/> dans la barre d'adresse (à droite).</p>
+        </div>
+    </div>
+);
+
 // --- COMPOSANT : MODAL PROFIL & CV ---
 const ProfileModal = ({ onClose, profile, handleProfileUpload, email }) => {
     return (
@@ -151,11 +314,17 @@ const LegalModal = ({ onClose, onExport, onDeleteAccount, isAuthScreen }) => (
         </section>
         
         <section>
-            <h3 className="font-bold text-lg mb-2 text-gray-900">2. Vos Droits (RGPD)</h3>
+            <h3 className="font-bold text-lg mb-2 text-gray-900">2. Hébergement & Données</h3>
+            <p className="mb-2"><strong>Base de données :</strong> Stockée chez <strong>Supabase</strong> (AWS), localisée en <strong>Irlande (Union Européenne)</strong>. Conforme aux normes RGPD strictes.</p>
+            <p><strong>Déploiement :</strong> Application déployée via <strong>Vercel</strong>.</p>
+        </section>
+
+        <section>
+            <h3 className="font-bold text-lg mb-2 text-gray-900">3. Vos Droits (RGPD)</h3>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li><strong>Droit à l'oubli :</strong> Vous pouvez supprimer votre compte et toutes vos données à tout moment.</li>
-                <li><strong>Portabilité :</strong> Vous pouvez exporter vos données au format CSV.</li>
-                <li><strong>Hébergement :</strong> Les données sont sécurisées via Supabase.</li>
+                <li><strong>Droit à l'oubli :</strong> Suppression totale possible à tout moment.</li>
+                <li><strong>Portabilité :</strong> Export CSV disponible ci-dessous.</li>
+                <li><strong>Confidentialité :</strong> Vos données ne sont ni vendues ni partagées.</li>
             </ul>
         </section>
 
@@ -287,6 +456,9 @@ const App = () => {
   const [showLegal, setShowLegal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   
+  // NOUVEAU : GESTION DES VUES (ONGLETS)
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'conseils', 'tutos'
+
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("date_desc"); 
   const [viewMode, setViewMode] = useState("list"); 
@@ -334,7 +506,7 @@ const App = () => {
     if (!upErr) {
       const { data } = supabase.storage.from('documents').getPublicUrl(fileName);
       const updateData = type === 'ats' ? { cv_ats: data.publicUrl } : { cv_human: data.publicUrl };
-      await supabase.from('profile').update(updateData).gt('id', 0); // Hack simple si on n'a pas l'ID exact
+      await supabase.from('profile').update(updateData).gt('id', 0);
       setProfile(prev => ({ ...prev, ...updateData }));
     } else {
         alert("Erreur upload: " + upErr.message);
@@ -345,21 +517,12 @@ const App = () => {
   // --- LOGIQUE ANTI-DOUBLON ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Normalisation pour comparer "Thales", "thalès", "THALES"
     const normalize = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
     const cleanCompany = normalize(newApp.company);
-
-    // Vérification
-    const isDuplicate = applications.some(app => 
-        app.id !== editingId && // On ne compare pas avec soi-même si on édite
-        normalize(app.company) === cleanCompany
-    );
+    const isDuplicate = applications.some(app => app.id !== editingId && normalize(app.company) === cleanCompany);
 
     if (isDuplicate) {
-        if (!window.confirm(`⚠️ Attention : Vous avez déjà une candidature pour "${newApp.company}". Voulez-vous quand même l'ajouter ?`)) {
-            return; // On annule si l'utilisateur dit Non
-        }
+        if (!window.confirm(`⚠️ Attention : Vous avez déjà une candidature pour "${newApp.company}". Voulez-vous quand même l'ajouter ?`)) return;
     }
 
     setUploading(true);
@@ -411,7 +574,6 @@ const App = () => {
     return date.toLocaleDateString('fr-FR'); 
   };
 
-  // --- PRÉPARATION AUTO-COMPLÉTION ---
   const uniqueCompanies = [...new Set(applications.map(a => a.company).filter(Boolean))].sort();
   const uniqueLocations = [...new Set(applications.map(a => a.location).filter(Boolean))].sort();
 
@@ -431,251 +593,142 @@ const App = () => {
     <div className="min-h-screen bg-[#f8f9fa] text-slate-800 font-sans flex flex-col">
       <div className="max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6 flex-1">
         
-        {/* HEADER */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* HEADER NAVIGATION */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-2 z-40">
           <div className="flex items-center gap-4 w-full md:w-auto">
-             {/* LOGO */}
              <div className="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden relative border border-gray-100">
                 <img src="/logo.png" onError={(e) => {e.target.style.display='none';}} className="w-full h-full object-contain z-10" alt="Logo"/>
                 <Briefcase size={24} className="text-blue-500 absolute opacity-50"/>
              </div>
-             <h1 className="font-extrabold text-2xl text-[#0f1f41]">Suivi Alternance</h1>
+             
+             {/* MENU DE NAVIGATION */}
+             <div className="flex bg-gray-100 p-1 rounded-lg">
+                <button onClick={() => setCurrentView('dashboard')} className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${currentView === 'dashboard' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Tableau</button>
+                <button onClick={() => setCurrentView('conseils')} className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${currentView === 'conseils' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}><BookOpen size={16}/> <span className="hidden sm:inline">Conseils</span></button>
+                <button onClick={() => setCurrentView('tutos')} className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${currentView === 'tutos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}><Smartphone size={16}/> <span className="hidden sm:inline">Tutos</span></button>
+             </div>
           </div>
           
           <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-             {/* Email de l'utilisateur + Bouton Profil */}
              <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
-                 <span className="text-sm font-bold text-gray-600 hidden md:block">{session.user.email}</span>
                  <button onClick={() => setShowProfile(true)} className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800">
-                    <User size={18}/> <span className="hidden sm:inline">Mon Profil & CV</span>
+                    <User size={18}/> <span className="hidden sm:inline">Mon Profil</span>
                  </button>
              </div>
-
              <button onClick={() => {supabase.auth.signOut(); setSession(null);}} className="text-red-500 p-2.5 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100 transition-colors" title="Se déconnecter">
                 <LogOut size={20}/>
              </button>
           </div>
         </div>
 
-        {/* ROUTINE */}
-        <DailyRoutine />
+        {/* --- CONTENU DYNAMIQUE SELON LA VUE --- */}
 
-        {/* FORMULAIRE EN HAUT */}
-        <div ref={formRef} className={`bg-white p-6 rounded-xl shadow-sm border-2 transition-all ${editingId ? 'border-orange-400 bg-orange-50/30' : 'border-transparent'}`}>
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="font-extrabold text-[#0f1f41] flex items-center gap-2 text-xl">
-                    {editingId ? <Pencil className="text-orange-500" size={24}/> : <Plus className="text-blue-600" size={24}/>}
-                    {editingId ? "Modifier la candidature" : "Nouvelle candidature"}
-                </h2>
-                {editingId && <button onClick={resetForm} className="text-gray-400 hover:text-gray-600"><X size={24}/></button>}
-            </div>
-            
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                {/* LISTES POUR AUTO-COMPLETION */}
-                <datalist id="companies-list">
-                    {uniqueCompanies.map(c => <option key={c} value={c}/>)}
-                </datalist>
-                <datalist id="locations-list">
-                    {uniqueLocations.map(l => <option key={l} value={l}/>)}
-                </datalist>
+        {/* VUE 1 : DASHBOARD (Classique) */}
+        {currentView === 'dashboard' && (
+            <div className="animate-fadeIn">
+                <DailyRoutine />
 
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Entreprise</label>
-                    <input list="companies-list" placeholder="Ex: Thales, Google..." className="w-full border border-gray-300 p-3 rounded-lg text-base bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Poste</label>
-                    <input placeholder="Ex: Data Analyst" className="w-full border border-gray-300 p-3 rounded-lg text-base bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={newApp.role} onChange={e=>setNewApp({...newApp, role: e.target.value})} required/>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Plateforme / Source</label>
-                    <select className="w-full border border-gray-300 p-3 rounded-lg text-base bg-gray-50 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={newApp.source} onChange={e=>setNewApp({...newApp, source: e.target.value})}>
-                        {SOURCE_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}
-                    </select>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Statut actuel</label>
-                    <select className="w-full border border-gray-300 p-3 rounded-lg text-base bg-gray-50 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>
-                        {STATUS_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}
-                    </select>
-                </div>
-
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Date de candidature</label>
-                    <input type="date" className="w-full border border-gray-300 p-3 rounded-lg text-base bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Ville</label>
-                    <input list="locations-list" placeholder="Ex: Paris, Lyon..." className="w-full border border-gray-300 p-3 rounded-lg text-base bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} />
-                </div>
-                <div className="lg:col-span-2 space-y-1.5">
-                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Lien de l'annonce ou Email</label>
-                    <div className="relative">
-                        <LinkIcon className="absolute left-3 top-3.5 text-gray-400" size={16}/>
-                        <input placeholder="URL de l'offre ou email de contact" className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-base bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={newApp.application_url || newApp.contact_email} onChange={e=>setNewApp({...newApp, application_url: e.target.value, contact_email: e.target.value})} />
+                {/* FORMULAIRE */}
+                <div ref={formRef} className={`bg-white p-6 rounded-xl shadow-sm border-2 mb-6 transition-all ${editingId ? 'border-orange-400 bg-orange-50/30' : 'border-transparent'}`}>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="font-extrabold text-[#0f1f41] flex items-center gap-2 text-xl">
+                            {editingId ? <Pencil className="text-orange-500" size={24}/> : <Plus className="text-blue-600" size={24}/>}
+                            {editingId ? "Modifier la candidature" : "Nouvelle candidature"}
+                        </h2>
+                        {editingId && <button onClick={resetForm} className="text-gray-400 hover:text-gray-600"><X size={24}/></button>}
                     </div>
+                    
+                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <datalist id="companies-list">{uniqueCompanies.map(c => <option key={c} value={c}/>)}</datalist>
+                        <datalist id="locations-list">{uniqueLocations.map(l => <option key={l} value={l}/>)}</datalist>
+
+                        <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Entreprise</label><input list="companies-list" placeholder="Ex: Thales..." className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.company} onChange={e=>setNewApp({...newApp, company: e.target.value})} required/></div>
+                        <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Poste</label><input placeholder="Ex: Data Analyst" className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.role} onChange={e=>setNewApp({...newApp, role: e.target.value})} required/></div>
+                        <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Source</label><select className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.source} onChange={e=>setNewApp({...newApp, source: e.target.value})}>{SOURCE_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
+                        <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Statut</label><select className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.status} onChange={e=>setNewApp({...newApp, status: e.target.value})}>{STATUS_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
+                        <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Date</label><input type="date" className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.date} onChange={e=>setNewApp({...newApp, date: e.target.value})} required /></div>
+                        <div className="space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Ville</label><input list="locations-list" placeholder="Ex: Paris..." className="w-full border border-gray-300 p-3 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.location} onChange={e=>setNewApp({...newApp, location: e.target.value})} /></div>
+                        <div className="lg:col-span-2 space-y-1.5"><label className="text-xs font-bold text-gray-500 uppercase ml-1">Lien / Email</label><div className="relative"><LinkIcon className="absolute left-3 top-3.5 text-gray-400" size={16}/><input placeholder="URL ou email..." className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-base outline-none focus:ring-2 focus:ring-blue-500" value={newApp.application_url || newApp.contact_email} onChange={e=>setNewApp({...newApp, application_url: e.target.value, contact_email: e.target.value})} /></div></div>
+                        <button disabled={uploading} className={`lg:col-span-4 py-3.5 rounded-lg text-white font-bold text-base shadow-md transition-all active:scale-95 ${editingId ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#005792] hover:bg-[#004270]'}`}>{uploading ? "Chargement..." : (editingId ? "Mettre à jour" : "Ajouter")}</button>
+                    </form>
                 </div>
 
-                <button disabled={uploading} className={`lg:col-span-4 py-3.5 rounded-lg text-white font-bold text-base shadow-md transition-all active:scale-95 ${editingId ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#005792] hover:bg-[#004270]'}`}>
-                    {uploading ? "Chargement..." : (editingId ? "Mettre à jour la candidature" : "Ajouter au tableau")}
-                </button>
-            </form>
-        </div>
-
-        {/* TABLEAU ET FILTRES */}
-        <div className="space-y-4">
-             <div className="flex flex-wrap gap-3 items-center">
-                <div className="flex bg-white rounded-lg border p-1 shadow-sm">
-                   <button onClick={()=>setViewMode('list')} className={`p-2.5 rounded ${viewMode==='list'?'bg-blue-50 text-blue-600':'text-gray-400'}`}><List size={20}/></button>
-                   <button onClick={()=>setViewMode('kanban')} className={`p-2.5 rounded ${viewMode==='kanban'?'bg-blue-50 text-blue-600':'text-gray-400'}`}><LayoutGrid size={20}/></button>
-                </div>
-                <div className="flex-1 min-w-[250px] relative">
-                   <Search className="absolute left-3 top-3 text-gray-400" size={18}/>
-                   <input placeholder="Rechercher une entreprise..." className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-base shadow-sm outline-none focus:ring-2 focus:ring-blue-500" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
-                </div>
-                <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-4 py-2.5 text-base bg-white shadow-sm cursor-pointer outline-none">
-                    <option value="date_desc">📅 Plus récent</option>
-                    <option value="date_asc">📅 Plus ancien</option>
-                    <option value="source">🌐 Par Plateforme</option>
-                    <option value="favorite">❤️ Favoris</option>
-                    <option value="alpha">🔤 Alphabétique</option>
-                </select>
-             </div>
-
-             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                {viewMode === 'list' ? (
-                   <>
-                     {/* VUE TABLEAU (ORDI) */}
-                     <div className="hidden md:block overflow-x-auto">
-                        <table className="w-full text-left text-base">
-                          <thead className="bg-gray-50 text-gray-600 font-bold uppercase text-xs border-b">
-                            <tr>
-                               <th className="p-4 w-12"></th>
-                               <th className="p-4">Entreprise</th>
-                               <th className="p-4">Poste</th>
-                               <th className="p-4">Date</th>
-                               <th className="p-4">Source</th>
-                               <th className="p-4">Lien / Contact</th>
-                               <th className="p-4">Statut</th>
-                               <th className="p-4 text-center">Relance</th>
-                               <th className="p-4 text-right">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y">
-                            {filteredApps.map(app => (
-                              <tr key={app.id} className="hover:bg-gray-50/80 group transition-colors">
-                                 <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
-                                 <td className="p-4">
-                                   <div className="font-bold text-[#0f1f41] text-base max-w-[150px] truncate" title={app.company}>{app.company}</div>
-                                   <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5"><MapPin size={10}/>{app.location || "N/A"}</div>
-                                 </td>
-                                 <td className="p-4 text-gray-600 font-medium max-w-[150px] truncate" title={app.role}>{app.role}</td>
-                                 <td className="p-4 text-gray-500 text-sm">{new Date(app.date).toLocaleDateString('fr-FR')}</td>
-                                 <td className="p-4 whitespace-nowrap">
-                                   <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-xs font-bold border border-gray-200">{app.source}</span>
-                                 </td>
-                                 
-                                 <td className="p-4">
-                                   {app.source === 'Contact direct' ? (
-                                       app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1 text-xs font-medium"><Mail size={14}/> {app.contact_email}</a> : <span className="text-gray-300 text-xs">-</span>
-                                   ) : (
-                                       app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md flex items-center gap-1.5 w-fit hover:bg-blue-100 text-xs font-bold border border-blue-100 transition-colors"><ExternalLink size={14}/> Voir l'annonce</a> : <span className="text-gray-300 text-xs">-</span>
-                                   )}
-                                 </td>
-
-                                 <td className="p-4">
-                                   <span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${
-                                       app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : 
-                                       app.status==='Refusé' ? 'bg-red-50 border-red-200 text-red-700' : 
-                                       app.status==='Accepté' ? 'bg-green-50 border-green-200 text-green-700' : 
-                                       'bg-gray-50 border-gray-200'}`}>{app.status}</span>
-                                 </td>
-                                 <td className="p-4 text-center">
-                                   <div className="flex flex-col items-center gap-1.5">
-                                       <span className={`text-xs font-bold px-2 py-0.5 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span>
-                                       <input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600"/>
-                                   </div>
-                                 </td>
-                                 <td className="p-4 text-right space-x-2">
-                                   <button onClick={()=>handleEdit(app)} className="text-gray-300 hover:text-blue-500 transition-colors"><Pencil size={18}/></button>
-                                   <button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
-                                 </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                     </div>
-                     
-                     {/* VUE CARTE (MOBILE UNIQUEMENT) */}
-                     <div className="md:hidden flex flex-col gap-4 p-4">
-                        {filteredApps.map(app => (
-                            <div key={app.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 relative">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="font-bold text-lg text-[#0f1f41]">{app.company}</h3>
-                                        <p className="text-gray-600 font-medium">{app.role}</p>
-                                    </div>
-                                    <button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button>
-                                </div>
-                                
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                    <MapPin size={14}/> {app.location || "Non renseigné"}
-                                </div>
-
-                                <div className="flex flex-wrap gap-2 items-center mt-1">
-                                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
-                                       app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : 
-                                       app.status==='Refusé' ? 'bg-red-50 border-red-200 text-red-700' : 
-                                       app.status==='Accepté' ? 'bg-green-50 border-green-200 text-green-700' : 
-                                       'bg-gray-50 border-gray-200'}`}>{app.status}</span>
-                                    <span className="text-xs text-gray-400 border px-2 py-1 rounded bg-gray-50">{app.source}</span>
-                                    <span className="text-xs text-gray-400">{new Date(app.date).toLocaleDateString('fr-FR')}</span>
-                                </div>
-
-                                <div className="pt-3 border-t flex justify-between items-center mt-1">
-                                    {/* Lien Mobile */}
-                                    {app.source === 'Contact direct' ? (
-                                       app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-600 flex items-center gap-1 text-xs font-bold"><Mail size={14}/> Email</a> : <span className="text-gray-300 text-xs">-</span>
-                                   ) : (
-                                       app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 flex items-center gap-1 text-xs font-bold"><ExternalLink size={14}/> Voir l'offre</a> : <span className="text-gray-300 text-xs">-</span>
-                                   )}
-                                   
-                                   <div className="flex gap-3">
-                                        <button onClick={()=>handleEdit(app)} className="text-gray-400 hover:text-blue-500"><Pencil size={18}/></button>
-                                        <button onClick={()=>handleDelete(app.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={18}/></button>
-                                   </div>
-                                </div>
-                            </div>
-                        ))}
-                     </div>
-                     {filteredApps.length === 0 && <div className="p-20 text-center text-gray-400 flex flex-col items-center gap-3 md:block hidden"><Search size={48} className="opacity-20 mx-auto"/><p className="text-lg">Aucune candidature trouvée</p></div>}
-                   </>
-                ) : (
-                   <div className="flex gap-4 p-4 overflow-x-auto h-full items-start bg-gray-50/50">
-                      {STATUS_OPTIONS.map(status => (
-                        <div key={status} className="min-w-[300px] bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-                           <h3 className="font-bold text-sm uppercase text-gray-500 mb-4 flex justify-between px-1">{status} <span className="bg-gray-100 px-2 rounded text-gray-600">{filteredApps.filter(a=>a.status===status).length}</span></h3>
-                           <div className="flex flex-col gap-3">
-                             {filteredApps.filter(a=>a.status===status).map(app => (
-                               <div key={app.id} className={`p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer bg-white relative group ${app.relanceDone ? 'bg-gray-50/50' : ''}`} onClick={()=>handleEdit(app)}>
-                                  <div className="flex justify-between items-start mb-2">
-                                      <div className="font-bold text-[#0f1f41] text-base leading-tight">{app.company}</div>
-                                      <button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={16} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-200"}/></button>
-                                  </div>
-                                  <div className="text-sm text-gray-600 mb-1">{app.role}</div>
-                                  <div className="flex justify-between items-center border-t pt-3 mt-2">
-                                    <div className="text-xs font-bold text-gray-500 uppercase whitespace-nowrap overflow-hidden text-ellipsis">{app.source}</div>
-                                    <div className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold">{calculateRelance(app.date)}</div>
-                                  </div>
-                               </div>
-                             ))}
-                           </div>
+                {/* FILTRES & TABLEAU */}
+                <div className="space-y-4">
+                     <div className="flex flex-wrap gap-3 items-center">
+                        <div className="flex bg-white rounded-lg border p-1 shadow-sm">
+                           <button onClick={()=>setViewMode('list')} className={`p-2.5 rounded ${viewMode==='list'?'bg-blue-50 text-blue-600':'text-gray-400'}`}><List size={20}/></button>
+                           <button onClick={()=>setViewMode('kanban')} className={`p-2.5 rounded ${viewMode==='kanban'?'bg-blue-50 text-blue-600':'text-gray-400'}`}><LayoutGrid size={20}/></button>
                         </div>
-                      ))}
-                   </div>
-                )}
-             </div>
-          </div>
+                        <div className="flex-1 min-w-[250px] relative">
+                           <Search className="absolute left-3 top-3 text-gray-400" size={18}/>
+                           <input placeholder="Rechercher..." className="w-full pl-10 pr-3 py-2.5 border rounded-lg text-base shadow-sm outline-none focus:ring-2 focus:ring-blue-500" value={searchTerm} onChange={e=>setSearchTerm(e.target.value)}/>
+                        </div>
+                        <select value={sortType} onChange={(e) => setSortType(e.target.value)} className="border rounded-lg px-4 py-2.5 text-base bg-white shadow-sm cursor-pointer outline-none">
+                            <option value="date_desc">📅 Plus récent</option>
+                            <option value="source">🌐 Par Plateforme</option>
+                            <option value="favorite">❤️ Favoris</option>
+                        </select>
+                     </div>
+
+                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        {viewMode === 'list' ? (
+                           <>
+                             <div className="hidden md:block overflow-x-auto">
+                                <table className="w-full text-left text-base">
+                                  <thead className="bg-gray-50 text-gray-600 font-bold uppercase text-xs border-b">
+                                    <tr><th className="p-4 w-12"></th><th className="p-4">Entreprise</th><th className="p-4">Poste</th><th className="p-4">Date</th><th className="p-4">Source</th><th className="p-4">Lien</th><th className="p-4">Statut</th><th className="p-4 text-center">Relance</th><th className="p-4 text-right">Action</th></tr>
+                                  </thead>
+                                  <tbody className="divide-y">
+                                    {filteredApps.map(app => (
+                                      <tr key={app.id} className="hover:bg-gray-50/80 group transition-colors">
+                                         <td className="p-4"><button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300 hover:text-red-300"}/></button></td>
+                                         <td className="p-4"><div className="font-bold text-[#0f1f41] text-base max-w-[150px] truncate" title={app.company}>{app.company}</div><div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5"><MapPin size={10}/>{app.location || "N/A"}</div></td>
+                                         <td className="p-4 text-gray-600 font-medium max-w-[150px] truncate">{app.role}</td>
+                                         <td className="p-4 text-gray-500 text-sm">{new Date(app.date).toLocaleDateString('fr-FR')}</td>
+                                         <td className="p-4 whitespace-nowrap"><span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded text-xs font-bold border border-gray-200">{app.source}</span></td>
+                                         <td className="p-4">{app.source === 'Contact direct' ? (app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-500 hover:underline flex items-center gap-1 text-xs font-medium"><Mail size={14}/> {app.contact_email}</a> : "-") : (app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md flex items-center gap-1.5 w-fit hover:bg-blue-100 text-xs font-bold border border-blue-100 transition-colors"><ExternalLink size={14}/> Voir</a> : "-")}</td>
+                                         <td className="p-4"><span className={`px-3 py-1.5 rounded-full text-xs font-bold border ${app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : app.status==='Refusé' ? 'bg-red-50 border-red-200 text-red-700' : app.status==='Accepté' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200'}`}>{app.status}</span></td>
+                                         <td className="p-4 text-center"><div className="flex flex-col items-center gap-1.5"><span className={`text-xs font-bold px-2 py-0.5 rounded ${app.relanceDone ? 'bg-green-100 text-green-700 opacity-50' : 'bg-orange-50 text-orange-600'}`}>{calculateRelance(app.date)}</span><input type="checkbox" checked={app.relanceDone || false} onChange={() => toggleRelance(app)} className="w-5 h-5 cursor-pointer accent-green-600"/></div></td>
+                                         <td className="p-4 text-right space-x-2"><button onClick={()=>handleEdit(app)} className="text-gray-300 hover:text-blue-500"><Pencil size={18}/></button><button onClick={()=>handleDelete(app.id)} className="text-gray-300 hover:text-red-500"><Trash2 size={18}/></button></td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                             </div>
+                             {/* MOBILE */}
+                             <div className="md:hidden flex flex-col gap-4 p-4">
+                                {filteredApps.map(app => (
+                                    <div key={app.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 relative">
+                                        <div className="flex justify-between items-start"><div><h3 className="font-bold text-lg text-[#0f1f41]">{app.company}</h3><p className="text-gray-600 font-medium">{app.role}</p></div><button onClick={()=>toggleFavorite(app)}><Heart size={20} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-300"}/></button></div>
+                                        <div className="flex items-center gap-2 text-sm text-gray-500"><MapPin size={14}/> {app.location || "Non renseigné"}</div>
+                                        <div className="flex flex-wrap gap-2 items-center mt-1"><span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${app.status==='Postulé' ? 'bg-blue-50 border-blue-200 text-blue-700' : app.status==='Refusé' ? 'bg-red-50 border-red-200 text-red-700' : app.status==='Accepté' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200'}`}>{app.status}</span><span className="text-xs text-gray-400 border px-2 py-1 rounded bg-gray-50">{app.source}</span><span className="text-xs text-gray-400">{new Date(app.date).toLocaleDateString('fr-FR')}</span></div>
+                                        <div className="pt-3 border-t flex justify-between items-center mt-1">{app.source === 'Contact direct' ? (app.contact_email ? <a href={`mailto:${app.contact_email}`} className="text-blue-600 flex items-center gap-1 text-xs font-bold"><Mail size={14}/> Email</a> : "-") : (app.application_url ? <a href={app.application_url} target="_blank" rel="noreferrer" className="text-blue-600 flex items-center gap-1 text-xs font-bold"><ExternalLink size={14}/> Voir l'offre</a> : "-")}<div className="flex gap-3"><button onClick={()=>handleEdit(app)} className="text-gray-400 hover:text-blue-500"><Pencil size={18}/></button><button onClick={()=>handleDelete(app.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={18}/></button></div></div>
+                                    </div>
+                                ))}
+                             </div>
+                             {filteredApps.length === 0 && <div className="p-20 text-center text-gray-400 hidden md:block"><Search size={48} className="opacity-20 mx-auto"/><p className="text-lg">Aucune candidature</p></div>}
+                           </>
+                        ) : (
+                           <div className="flex gap-4 p-4 overflow-x-auto h-full items-start bg-gray-50/50">
+                              {STATUS_OPTIONS.map(status => (
+                                <div key={status} className="min-w-[300px] bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                                   <h3 className="font-bold text-sm uppercase text-gray-500 mb-4 flex justify-between px-1">{status} <span className="bg-gray-100 px-2 rounded text-gray-600">{filteredApps.filter(a=>a.status===status).length}</span></h3>
+                                   <div className="flex flex-col gap-3">{filteredApps.filter(a=>a.status===status).map(app => ( <div key={app.id} className={`p-4 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer bg-white relative group ${app.relanceDone ? 'bg-gray-50/50' : ''}`} onClick={()=>handleEdit(app)}><div className="flex justify-between items-start mb-2"><div className="font-bold text-[#0f1f41] text-base leading-tight">{app.company}</div><button onClick={(e)=>{e.stopPropagation(); toggleFavorite(app);}}><Heart size={16} className={app.isFavorite ? "fill-red-500 text-red-500" : "text-gray-200"}/></button></div><div className="text-sm text-gray-600 mb-1">{app.role}</div><div className="flex justify-between items-center border-t pt-3 mt-2"><div className="text-xs font-bold text-gray-500 uppercase whitespace-nowrap overflow-hidden text-ellipsis">{app.source}</div><div className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold">{calculateRelance(app.date)}</div></div></div>))}</div>
+                                </div>
+                              ))}
+                           </div>
+                        )}
+                     </div>
+                </div>
+            </div>
+        )}
+
+        {/* VUE 2 : CONSEILS */}
+        {currentView === 'conseils' && <AdviceView />}
+
+        {/* VUE 3 : TUTOS */}
+        {currentView === 'tutos' && <TutosView />}
 
       </div> 
       
